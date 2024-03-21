@@ -7,8 +7,10 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
+    "esModuleInterop": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
@@ -17,7 +19,17 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* Builds */
+    "baseUrl": "./",
+    "paths": {
+      "@/api/webContainer": ["./src/api/webContainer/index.ts"],
+      "@/utils": ["./src/utils/index.ts"],
+//      "@/geometry": ["./src/geometry/index.ts"],
+//      "@/components": ["./src/components/index.ts"],
+//      "@/view": ["./src/view/index.ts"],
+    }
   },
   "include": [
     "src"
