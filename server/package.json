@@ -4,12 +4,11 @@
   "description": "Fun with promises",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --watch './' index.js"
+    "start": "node index.js"
   },
   "author": "mikhama",
   "license": "MIT",
   "devDependencies": {
-    "json-server": "^0.17.4",
-    "nodemon": "^3.1.0"
+    "json-server": "^0.17.4"
   }
 }
