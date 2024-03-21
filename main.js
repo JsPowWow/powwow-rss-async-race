@@ -1,7 +1,7 @@
-import '../style.css'
+import './style.css'
 import { WebContainer } from '@webcontainer/api';
 import { Terminal } from 'xterm';
-import { files } from '../files.js';
+import { files } from './files.js';
 import 'xterm/css/xterm.css';
 
 /** @type {import('@webcontainer/api').WebContainer}  */

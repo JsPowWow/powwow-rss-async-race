@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm run prepare && vite",
     "prepare": "node ./autoloader.js",
-    "build": "tsc && vite build",
+    "build": "npm run prepare && tsc && vite build",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "lint": "eslint ./src",
