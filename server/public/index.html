@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loading placeholder</title>
+</head>
+<body>
+HI-HI-HI-HI-HI-HI
+<button id="api-btn" type="button">Api</button>
+<div id="app"></div>
+<script type="text/javascript">
+  const apiBtn = document.getElementById('api-btn');
+  const app = document.getElementById('app');
+
+  apiBtn.addEventListener('click', ()=>{
+    console.log("Check Api...");
+    fetch("http://localhost:3000/garage", { method: 'GET', mode : 'no-cors' }).then((res)=>res.json()).then((res)=> {
+      console.log(res);
+      res.forEach((c)=> {
+        const car =document.createElement('div');
+        car.innerHTML = `${c.name}`
+        car.style.color = c.color;
+        app.append(car)
+      })
+    })
+  })
+</script>
+</body>
+</html>

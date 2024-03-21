@@ -1,0 +1,15 @@
+{
+  "name": "async-race-api",
+  "version": "1.0.0",
+  "description": "Fun with promises",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon --watch './' index.js"
+  },
+  "author": "mikhama",
+  "license": "MIT",
+  "devDependencies": {
+    "json-server": "^0.17.4",
+    "nodemon": "^3.1.0"
+  }
+}
