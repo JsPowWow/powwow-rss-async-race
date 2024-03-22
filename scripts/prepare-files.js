@@ -30,6 +30,8 @@ const racePage = isRacePageExists
 
 if (!isRacePageExists) {
   console.warn('No Race Page Found !!!', readdirSync(`.`));
+} else {
+  console.info('Race Page Found.', readdirSync(`.`));
 }
 
 const content = {
