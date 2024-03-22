@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "npm run prepare && vite",
-    "prepare": "vite build && node ./scripts/prepare-files.js",
-    "build": "tsc && npm run prepare && vite build && npm run prepare",
+    "prepare": "vite build && npm run build:files",
+    "build": "tsc && vite build",
     "preview": "vite preview",
+    "build:files": "node ./scripts/prepare-files.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint ./app",
     "lint:fix": "eslint --fix ./app"
