@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 
 const exportLine = 'export const files = ';
 const SERVER_DIR = './server';
@@ -9,17 +9,21 @@ const OUTPUT = './container/files.js';
 const files = ['index.js', 'package.json', 'package-lock.json'];
 
 // List of assets files to include into webContainers
-const assetsFiles = readdirSync(`./${DIST_DIR}/assets/`)
-  .filter((file) => !file.startsWith('main-'))
-  .reduce((acc, file) => {
-    const buffer = readFileSync(`./${DIST_DIR}/assets/${file}`);
-    acc[file] = {
-      file: { contents: buffer.toString() },
-    };
-    return acc;
-  }, {});
+const assetsFiles = existsSync(`./${DIST_DIR}/assets/`)
+  ? readdirSync(`./${DIST_DIR}/assets/`)
+      .filter((file) => !file.startsWith('main-'))
+      .reduce((acc, file) => {
+        const buffer = readFileSync(`./${DIST_DIR}/assets/${file}`);
+        acc[file] = {
+          file: { contents: buffer.toString() },
+        };
+        return acc;
+      }, {})
+  : undefined;
 
-const racePage = readFileSync(`./${DIST_DIR}/app/pages/race/index.html`).toString();
+const racePage = existsSync(`./${DIST_DIR}/app/pages/race/index.html`)
+  ? readFileSync(`./${DIST_DIR}/app/pages/race/index.html`).toString()
+  : '<<NoRacePage>>';
 
 const content = {
   public: {
