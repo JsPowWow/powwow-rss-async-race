@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
@@ -14,5 +15,13 @@ export default defineConfig({
       'Cross-Origin-Embedder-Policy': 'credentialless',
       'Cross-Origin-Opener-Policy': 'same-origin',
     },
-  }
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        race: resolve(__dirname, 'app/pages/race/index.html'),
+      },
+    },
+  },
 });

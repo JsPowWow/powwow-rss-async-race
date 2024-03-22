@@ -1,16 +1,16 @@
 {
-  "name": "vanilla-ts",
+  "name": "powwow-rss-async-race",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "scripts": {
     "start": "npm run prepare && vite",
-    "prepare": "node ./autoloader.js",
-    "build": "npm run prepare && tsc && vite build",
+    "prepare": "node ./scripts/prepare-files.js",
+    "build": "npm run prepare && tsc && vite build && npm run prepare",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
-    "lint": "eslint ./src",
-    "lint:fix": "eslint --fix ./src"
+    "lint": "eslint ./app",
+    "lint:fix": "eslint --fix ./app"
   },
   "dependencies": {
     "@webcontainer/api": "^1.1.9",

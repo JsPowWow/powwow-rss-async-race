@@ -40,6 +40,11 @@ const PORT = 3000;
 
 const state = { velocity: {}, blocked: {} };
 
+// server.use((req, res, next) => {
+//   console.log('Request Type:', req.method);
+//   next();
+// });
+
 server.use(middlewares);
 
 server.patch('/engine', (req, res) => {
