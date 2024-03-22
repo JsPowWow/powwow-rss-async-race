@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "npm run prepare && vite",
-    "prepare": "node ./scripts/prepare-files.js",
+    "prepare": "vite build && node ./scripts/prepare-files.js",
     "build": "tsc && npm run prepare && vite build && npm run prepare",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
