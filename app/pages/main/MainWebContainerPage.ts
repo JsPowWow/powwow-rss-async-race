@@ -1,3 +1,4 @@
+import type { FileSystemTree } from '@webcontainer/api';
 import { Terminal } from 'xterm';
 
 import { webContainer } from '@/api/web-container';
@@ -5,7 +6,6 @@ import { Component, IFrameComponent } from '@/components';
 
 import 'xterm/css/xterm.css';
 import classes from './MainWebContainerPage.module.css';
-import { files } from '../../../container/files';
 
 export class MainWebContainerPage extends Component<'main'> {
   // private readonly editor: TextAreaComponent;
@@ -36,7 +36,7 @@ export class MainWebContainerPage extends Component<'main'> {
     ]);
   }
 
-  public async init(): Promise<void> {
+  public async init(files: FileSystemTree): Promise<void> {
     // this.editor.setText(files['index.js'].file.contents);
     // this.editor.element.addEventListener('input', (e) => {
     //   if (e.currentTarget && 'value' in e.currentTarget) {

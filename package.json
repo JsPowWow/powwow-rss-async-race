@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm run prepare && vite",
     "prepare": "node ./scripts/prepare-files.js",
-    "build": "npm run prepare && tsc && vite build && npm run prepare",
+    "build": "tsc && npm run prepare && vite build && npm run prepare",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
     "lint": "eslint ./app",

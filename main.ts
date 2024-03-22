@@ -18,6 +18,12 @@ window.addEventListener('load', () => {
   } else {
     const webContainerPage = new MainWebContainerPage();
     app.append(webContainerPage.element);
-    webContainerPage.init().catch(noop);
+    console.log('importing....');
+    import('./container/files')
+      .then((module) => {
+        console.log('import done', module);
+        webContainerPage.init(module.files).catch(noop);
+      })
+      .catch((e) => console.error(e));
   }
 });
