@@ -8,8 +8,9 @@ const OUTPUT = './container/files.js';
 // List of files to include into webContainers
 const files = ['index.js', 'package.json', 'package-lock.json'];
 
+const isAssetsExists = existsSync(`./${DIST_DIR}/assets/`);
 // List of assets files to include into webContainers
-const assetsFiles = existsSync(`./${DIST_DIR}/assets/`)
+const assetsFiles = isAssetsExists
   ? readdirSync(`./${DIST_DIR}/assets/`)
       .filter((file) => !file.startsWith('main-'))
       .reduce((acc, file) => {
@@ -21,9 +22,15 @@ const assetsFiles = existsSync(`./${DIST_DIR}/assets/`)
       }, {})
   : undefined;
 
-const racePage = existsSync(`./${DIST_DIR}/app/pages/race/index.html`)
+const isRacePageExists = existsSync(`./${DIST_DIR}/app/pages/race/index.html`);
+
+const racePage = isRacePageExists
   ? readFileSync(`./${DIST_DIR}/app/pages/race/index.html`).toString()
   : '<<NoRacePage>>';
+
+if (!isRacePageExists) {
+  console.warn('No Race Page Found !!!', readdirSync(`.`));
+}
 
 const content = {
   public: {
