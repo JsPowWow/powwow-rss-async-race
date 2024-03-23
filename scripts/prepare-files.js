@@ -12,7 +12,7 @@ const isAssetsExists = existsSync(`./${DIST_DIR}/assets/`);
 // List of assets files to include into webContainers
 const assetsFiles = isAssetsExists
   ? readdirSync(`./${DIST_DIR}/assets/`)
-      .filter((file) => !file.startsWith('main-') && !file.startsWith('files-'))
+      .filter((file) => !(file.startsWith('main-') && file.endsWith('.js')) && !file.startsWith('files-'))
       .reduce((acc, file) => {
         const buffer = readFileSync(`./${DIST_DIR}/assets/${file}`);
         acc[file] = {
@@ -33,7 +33,7 @@ if (!isRacePageExists) {
 const content = {
   public: {
     directory: {
-      'race.html': {
+      'async-race.html': {
         file: { contents: racePage },
       },
       assets: {

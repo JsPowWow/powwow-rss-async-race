@@ -1,9 +1,11 @@
 import { Component, NeonText } from '@/components';
 
-export class RacePageStandalone extends Component<'main'> {
-  constructor() {
-    super('main', { id: 'main-page' });
+import classes from './RacePageStandalone.module.css';
 
+export class RacePageStandalone extends Component<'div'> {
+  constructor() {
+    super('div');
+    this.toggleClass(classes.mainPageContainer);
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     const apiGarageBtn = new Component('button', { id: 'api-garage-btn' }).setTextContent('/garage');
     const apiStartSecondBtn = new Component('button', { id: 'api-start-engine-btn' }).setTextContent(
@@ -39,7 +41,7 @@ export class RacePageStandalone extends Component<'main'> {
       //     new Component('span').toggleClass(classes.caption).setTextContent('Async Race'),
       //   ]),
       // ]),
-      new NeonText().setTextContent('Async race').setAlternate(true),
+      new NeonText().setTextContent('Async race'),
       new Component('div').setTextContent(
         `@@@ "Async Race" is under construction; Try the "http://localhost:3000/[api's]" @@@@`,
       ),

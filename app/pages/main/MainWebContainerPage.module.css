@@ -4,10 +4,10 @@
 
 .app-iframe {
   min-height: 35rem;
+  height: 100%;
   width: 100%;
-  min-width: 768px;
   border: none;
-  background-color: black;
+  background: black;
 }
 
 .server-code-wrapper {
@@ -26,6 +26,7 @@
 }
 
 .app-container {
+  flex-grow: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: 100%;
@@ -34,6 +35,11 @@
     grid-column: span 2;
   }
 }
+
+.terminal-wrapper {
+  overflow: hidden;
+}
+
 
 .caption {
   -webkit-text-fill-color: #0000;

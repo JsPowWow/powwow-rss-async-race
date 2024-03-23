@@ -1,0 +1,14 @@
+/*.caption {*/
+/*  -webkit-text-fill-color: #0000;*/
+/*  background-clip: text;*/
+/*  -webkit-background-clip: text;*/
+/*  background-image: linear-gradient(to right,#761fac 0,#8a19a9 20%,#d900a5 70%,#d917a3 100%);*/
+/*  filter: drop-shadow(0 1px 0 #fff);*/
+/*  font-weight: 800;*/
+/*  color:#69f5ff;*/
+/*  text-decoration: underline;*/
+/*}*/
+
+.main-page-container {
+    width: 100%;
+}

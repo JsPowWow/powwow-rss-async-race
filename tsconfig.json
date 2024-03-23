@@ -31,7 +31,7 @@
       "@/geometry": ["./app/geometry/index.ts"],
       "@/components": ["./app/components/index.ts"],
       "@/view/main": ["./app/pages/main/index.ts"],
-      "@/view/race": ["./app/pages/race/index.ts"]
+      "@/view/race": ["./app/pages/raceStandalone/index.ts"]
     }
   },
   "include": [

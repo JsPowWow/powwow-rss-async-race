@@ -5,7 +5,7 @@
 
   color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: black;
+  background: black;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,8 +24,6 @@ a:hover {
 
 body {
   display: flex;
-  min-width: 850px;
-  min-height: 100vh;
   background: black;
 }
 
@@ -36,12 +34,23 @@ h1 {
 
 #app {
   width: 100%;
+  min-height: 100vh;
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
+  display: flex;
+
   & .xterm .xterm-viewport {
     overflow-y: hidden;
   }
+
+  #web-container-main-page {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
 }
 
 button {
@@ -65,7 +74,7 @@ button:focus-visible {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    color: #213547;
+    color: yellowgreen;
     background-color: black;
   }
   a:hover {

@@ -6,8 +6,9 @@ import { Component, IFrameComponent } from '@/components';
 
 import 'xterm/css/xterm.css';
 import classes from './MainWebContainerPage.module.css';
+import { ASYNC_RACE_LOADED } from '../messages.ts';
 
-export class MainWebContainerPage extends Component<'main'> {
+export class MainWebContainerPage extends Component<'div'> {
   // private readonly editor: TextAreaComponent;
 
   private readonly terminal: Component<'div'>;
@@ -15,11 +16,11 @@ export class MainWebContainerPage extends Component<'main'> {
   private readonly iframe: IFrameComponent;
 
   constructor() {
-    super('main', { id: 'main-page' });
+    super('div', { id: 'web-container-main-page' });
     // this.editor = new TextAreaComponent()
     //   .setTextContent('Express Server code...')
     //   .toggleClass(classes.serverCodeEditor);
-    this.terminal = new Component('div', { id: 'terminal-wrapper' });
+    this.terminal = new Component('div').toggleClass(classes.terminalWrapper);
     this.iframe = new IFrameComponent().setSource('/loading.html').toggleClass(classes.appIframe);
 
     this.appendChildren([
@@ -27,7 +28,7 @@ export class MainWebContainerPage extends Component<'main'> {
         .setStyles({ textAlign: 'left' })
         .appendChildren([
           new Component('h1').appendChildren([
-            new Component('span').toggleClass(classes.caption).setTextContent('WebContainers...'),
+            new Component('span').toggleClass(classes.caption).setTextContent('WebContainers'),
           ]),
         ]),
       new Component('div').toggleClass(classes.appContainer).appendChildren([
@@ -47,6 +48,7 @@ export class MainWebContainerPage extends Component<'main'> {
     // });
     const terminal = new Terminal({
       convertEol: true,
+      rows: 8,
     });
 
     terminal.open(this.terminal.element);
@@ -62,6 +64,17 @@ export class MainWebContainerPage extends Component<'main'> {
     terminal.write('\nStarting Dev Server...\n');
     const { url } = await webContainer.startDevServer();
 
-    this.iframe.setSource(`${url}/race.html`);
+    this.iframe.setStyles({
+      visibility: 'hidden',
+    });
+    const { iframe } = this;
+    this.iframe.setSource(`${url}/async-race.html`);
+    window.addEventListener('message', function (event) {
+      if (event.data === ASYNC_RACE_LOADED) {
+        iframe.setStyles({
+          visibility: 'visible',
+        });
+      }
+    });
   }
 }
