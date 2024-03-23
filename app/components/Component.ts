@@ -77,6 +77,7 @@ export class Component<Tag extends HTMLElementTag> {
     node.className = className;
     node.textContent = text;
     this.nodeElement = node;
+    // TODO AR allow to append children here as well
     elementToComponentMap.set(this.nodeElement, this);
   }
 
@@ -198,11 +199,10 @@ export class Component<Tag extends HTMLElementTag> {
 
   /**
    * Toggles the presence of a CSS class on the component's HTML node.
-   * @param {string} className - The class name to toggle.
    */
-  public toggleClass(className: string): typeof this {
+  public toggleClass(className: string, force?: boolean): typeof this {
     if (className) {
-      this.nodeElement.classList.toggle(className);
+      this.nodeElement.classList.toggle(className, force);
     }
     return this;
   }

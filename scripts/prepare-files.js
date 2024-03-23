@@ -12,7 +12,7 @@ const isAssetsExists = existsSync(`./${DIST_DIR}/assets/`);
 // List of assets files to include into webContainers
 const assetsFiles = isAssetsExists
   ? readdirSync(`./${DIST_DIR}/assets/`)
-      .filter((file) => !file.startsWith('main-'))
+      .filter((file) => !file.startsWith('main-') && !file.startsWith('files-'))
       .reduce((acc, file) => {
         const buffer = readFileSync(`./${DIST_DIR}/assets/${file}`);
         acc[file] = {
@@ -22,16 +22,12 @@ const assetsFiles = isAssetsExists
       }, {})
   : undefined;
 
-const isRacePageExists = existsSync(`./${DIST_DIR}/app/pages/race/index.html`);
+const isRacePageExists = existsSync(`./${DIST_DIR}/async-race.html`);
 
-const racePage = isRacePageExists
-  ? readFileSync(`./${DIST_DIR}/app/pages/race/index.html`).toString()
-  : '<<NoRacePage>>';
+const racePage = isRacePageExists ? readFileSync(`./${DIST_DIR}/async-race.html`).toString() : '<<NoRacePage>>';
 
 if (!isRacePageExists) {
-  console.error('No Race Page Found !!!', readdirSync(`.`));
-} else {
-  console.info('Ok', readdirSync(`.`));
+  console.error('!!! No Race Page Found !!!', readdirSync(`.`));
 }
 
 const content = {

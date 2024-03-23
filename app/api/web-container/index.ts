@@ -1,16 +1,15 @@
 import type { FileSystemTree, WebContainerProcess } from '@webcontainer/api';
 import { WebContainer } from '@webcontainer/api';
-import type { Terminal } from 'xterm';
 
 import { assertIsNonNullable, noop } from '@/utils';
 
 export const webContainer = new (class {
   private webContainerInstance?: WebContainer;
 
-  private terminal?: Terminal;
+  private onLogMessage?: (log: string) => void;
 
-  public async init(files: FileSystemTree, terminal?: Terminal): Promise<WebContainer> {
-    this.terminal = terminal;
+  public async init(files: FileSystemTree, onLogMessage?: (log: string) => void): Promise<WebContainer> {
+    this.onLogMessage = onLogMessage;
     this.webContainerInstance = await WebContainer.boot({ coep: 'credentialless' });
     await this.webContainerInstance.mount(files);
     return this.webContainerInstance;
@@ -55,12 +54,11 @@ export const webContainer = new (class {
   // }
 
   private writeProcessToTerminal(process: WebContainerProcess): void {
-    if (this.terminal) {
-      const term = this.terminal;
+    if (this.onLogMessage) {
       process.output
         .pipeTo(
           new WritableStream({
-            write: (data) => term.write(data),
+            write: this.onLogMessage,
           }),
         )
         .catch(noop); // TODO AR logging

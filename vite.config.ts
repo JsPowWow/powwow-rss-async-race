@@ -20,7 +20,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
-        race: resolve(__dirname, 'app/pages/race/index.html'),
+        race: resolve(__dirname, 'async-race.html'),
       },
     },
   },

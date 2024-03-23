@@ -26,13 +26,15 @@
     "baseUrl": "./",
     "paths": {
       "@/api/web-container": ["./app/api/web-container/index.ts"],
+      "@/logger": ["./app/utils/Logger.ts"],
       "@/utils": ["./app/utils/index.ts"],
       "@/geometry": ["./app/geometry/index.ts"],
       "@/components": ["./app/components/index.ts"],
       "@/view/main": ["./app/pages/main/index.ts"],
+      "@/view/race": ["./app/pages/race/index.ts"]
     }
   },
   "include": [
-    "app", "container", "main.ts"
+    "app", "container", "main.ts", "async-race.ts"
   ]
 }

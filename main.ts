@@ -1,10 +1,10 @@
 import './normalize.css';
 import './style.css';
+import logger from '@/logger';
 import { assertIsNonNullable, noop } from '@/utils';
-import { MainPageStandalone, MainWebContainerPage } from '@/view/main';
+import { MainWebContainerPage } from '@/view/main';
+import { RacePageStandalone } from '@/view/race';
 
-const app = document.querySelector('#app');
-assertIsNonNullable(app);
 const envMode = import.meta.env.MODE;
 const params = new URLSearchParams(window.location.search);
 
@@ -12,18 +12,21 @@ const isDevMode = envMode === 'development';
 const isWebContainerMode = params.has('mode', 'webcontainer');
 const isStandaloneMode = params.has('mode', 'standalone');
 
+const app = document.querySelector('#app');
+assertIsNonNullable(app);
+
 window.addEventListener('load', () => {
   if ((isDevMode && !isWebContainerMode) || isStandaloneMode) {
-    app.append(new MainPageStandalone().element);
+    app.append(new RacePageStandalone().element);
   } else {
     const webContainerPage = new MainWebContainerPage();
     app.append(webContainerPage.element);
-    console.log('importing....');
     import('./container/files')
       .then((module) => {
-        console.log('import done', module);
         webContainerPage.init(module.files).catch(noop);
       })
-      .catch((e) => console.error(e));
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
+      .catch(logger.error);
+    // TODO AR use Logger of such case(s)
   }
 });

@@ -1,3 +1,11 @@
+html {
+  background: black;
+}
+
+body {
+  min-height: 100vh;
+}
+
 .caption {
   -webkit-text-fill-color: #0000;
   background-clip: text;

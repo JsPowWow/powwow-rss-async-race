@@ -15,19 +15,21 @@ export class MainWebContainerPage extends Component<'main'> {
   private readonly iframe: IFrameComponent;
 
   constructor() {
-    super('main', { id: 'main=page' });
+    super('main', { id: 'main-page' });
     // this.editor = new TextAreaComponent()
     //   .setTextContent('Express Server code...')
     //   .toggleClass(classes.serverCodeEditor);
     this.terminal = new Component('div', { id: 'terminal-wrapper' });
-    this.iframe = new IFrameComponent().setSource('/loading.html');
+    this.iframe = new IFrameComponent().setSource('/loading.html').toggleClass(classes.appIframe);
 
     this.appendChildren([
-      new Component('header').appendChildren([
-        new Component('h1').appendChildren([
-          new Component('span').toggleClass(classes.caption).setTextContent('Async Race via WebContainers In Action'),
+      new Component('header')
+        .setStyles({ textAlign: 'left' })
+        .appendChildren([
+          new Component('h1').appendChildren([
+            new Component('span').toggleClass(classes.caption).setTextContent('WebContainers...'),
+          ]),
         ]),
-      ]),
       new Component('div').toggleClass(classes.appContainer).appendChildren([
         // new Component('div').toggleClass(classes.serverCodeWrapper).appendChildren([this.editor]),
         new Component('div').toggleClass(classes.raceAppContainer).appendChildren([this.iframe]),
@@ -49,7 +51,7 @@ export class MainWebContainerPage extends Component<'main'> {
 
     terminal.open(this.terminal.element);
     // Call only once
-    await webContainer.init(files, terminal);
+    await webContainer.init(files, (log) => terminal.write(log));
 
     terminal.write('\nInstall Dependencies...\n');
     const exitCode = await webContainer.installDependencies();
@@ -63,25 +65,3 @@ export class MainWebContainerPage extends Component<'main'> {
     this.iframe.setSource(`${url}/race.html`);
   }
 }
-// app.innerHTML = `
-//   <header>
-//     <h1><span class="wc">Async Race via WebContainers In Action</span></h1>
-//   </header>
-//   <div class="container">
-//     <div class="editor">
-//       <textarea>I am a textarea</textarea>
-//     </div>
-//     <div class="preview">
-//       <iframe src="/loading.html"></iframe>
-//     </div>
-//   </div>
-//   <div class="terminal"></div>
-// `;
-//
-// const iframeEl = document.querySelector('iframe');
-
-// const textareaEl = document.querySelector('textarea');
-
-// const terminalEl = document.querySelector<HTMLElement>('.terminal');
-
-// standalone
