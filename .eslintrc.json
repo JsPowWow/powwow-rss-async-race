@@ -60,6 +60,7 @@
         // "import/no-unresolved": "error",
         "import/no-cycle": "error",
         // 'import/no-named-as-default-member': 'off',
+        "no-plusplus": "off",
         "import/order": [
             "error",
             {
@@ -105,7 +106,7 @@
             }
         },
         "import/parsers": {
-            "@typescript-eslint/parser": [".ts"]
+            "@typescript-eslint/parser": [".ts", ".js"]
         }
     }
 }

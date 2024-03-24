@@ -64,12 +64,13 @@ export class MainWebContainerPage extends Component<'div'> {
     terminal.write('\nStarting Dev Server...\n');
     const { url } = await webContainer.startDevServer();
 
+    // TODO AR try code below inside ..setSource
     this.iframe.setStyles({
       visibility: 'hidden',
     });
     const { iframe } = this;
     this.iframe.setSource(`${url}/async-race.html`);
-    window.addEventListener('message', function (event) {
+    window.addEventListener('message', (event) => {
       if (event.data === ASYNC_RACE_LOADED) {
         iframe.setStyles({
           visibility: 'visible',

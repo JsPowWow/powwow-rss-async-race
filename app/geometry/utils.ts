@@ -1,7 +1,7 @@
 import { Dimension } from './Dimension';
 import { Position } from './Position';
 import { Rectangle } from './Rectangle';
-import type { ScaleRatio, Size } from './types';
+import type { Point, ScaleRatio, Size } from './types';
 
 export const getElementBounds = <T extends Element>(element: T): Rectangle<T> => {
   const clientRect = element.getBoundingClientRect();
@@ -25,3 +25,43 @@ export const getElementRelativeBounds = <T extends HTMLElement>(element: T): Rec
 export const toScaleRatio = (size: Size): ScaleRatio => {
   return { scaleX: size.width, scaleY: size.height };
 };
+
+export function lerp(A: number, B: number, t: number): number {
+  return A + (B - A) * t;
+}
+
+export type Intersection = (Point & { offset: number }) | undefined;
+
+export function getIntersection(A: Point, B: Point, C: Point, D: Point): Intersection {
+  const tTop = (D.x - C.x) * (A.y - C.y) - (D.y - C.y) * (A.x - C.x);
+  const uTop = (C.y - A.y) * (A.x - B.x) - (C.x - A.x) * (A.y - B.y);
+  const bottom = (D.y - C.y) * (B.x - A.x) - (D.x - C.x) * (B.y - A.y);
+
+  if (bottom !== 0) {
+    const t = tTop / bottom;
+    const u = uTop / bottom;
+    if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
+      return {
+        x: lerp(A.x, B.x, t),
+        y: lerp(A.y, B.y, t),
+        offset: t,
+      };
+    }
+  }
+
+  return undefined;
+}
+
+export type Polygon = Point[];
+
+export function polysIntersect(poly1: Polygon, poly2: Polygon): boolean {
+  for (let i = 0; i < poly1.length; i += 1) {
+    for (let j = 0; j < poly2.length; j += 1) {
+      const touch = getIntersection(poly1[i], poly1[(i + 1) % poly1.length], poly2[j], poly2[(j + 1) % poly2.length]);
+      if (touch) {
+        return true;
+      }
+    }
+  }
+  return false;
+}

@@ -30,8 +30,10 @@
       "@/utils": ["./app/utils/index.ts"],
       "@/geometry": ["./app/geometry/index.ts"],
       "@/components": ["./app/components/index.ts"],
-      "@/view/main": ["./app/pages/main/index.ts"],
-      "@/view/race": ["./app/pages/raceStandalone/index.ts"]
+      "@/engine": ["./app/engine/index.ts"],
+      "@/views/race-scene": ["./app/views/scene/index.ts"],
+      "@/pages/main": ["./app/pages/main/index.ts"],
+      "@/pages/race": ["./app/pages/raceStandalone/index.ts"],
     }
   },
   "include": [

@@ -1,9 +1,9 @@
 import './normalize.css';
 import './style.css';
 import logger from '@/logger';
-import { assertIsNonNullable, noop } from '@/utils';
-import { MainWebContainerPage } from '@/view/main';
-import { RacePageStandalone } from '@/view/race';
+import { MainWebContainerPage } from '@/pages/main';
+import { RacePageStandalone } from '@/pages/race';
+import { assertIsInstanceOf, noop } from '@/utils';
 
 const envMode = import.meta.env.MODE;
 const params = new URLSearchParams(window.location.search);
@@ -13,11 +13,11 @@ const isWebContainerMode = params.has('mode', 'webcontainer');
 const isStandaloneMode = params.has('mode', 'standalone');
 
 const app = document.querySelector('#app');
-assertIsNonNullable(app);
+assertIsInstanceOf(HTMLElement, app);
 
 window.addEventListener('load', () => {
   if ((isDevMode && !isWebContainerMode) || isStandaloneMode) {
-    app.append(new RacePageStandalone().element);
+    new RacePageStandalone(app).draw();
   } else {
     const webContainerPage = new MainWebContainerPage();
     app.append(webContainerPage.element);
@@ -25,8 +25,7 @@ window.addEventListener('load', () => {
       .then((module) => {
         webContainerPage.init(module.files).catch(noop);
       })
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
-      .catch(logger.error);
+      .catch((e) => logger.error(e));
     // TODO AR use Logger of such case(s)
   }
 });

@@ -1,11 +1,20 @@
 import { Component, NeonText } from '@/components';
+import { RaceScene } from '@/views/race-scene';
 
 import classes from './RacePageStandalone.module.css';
 
 export class RacePageStandalone extends Component<'div'> {
-  constructor() {
+  private readonly scene: RaceScene;
+
+  constructor(root: HTMLElement) {
     super('div');
     this.toggleClass(classes.mainPageContainer);
+    this.scene = new RaceScene();
+
+    root.append(this.element);
+  }
+
+  public draw(): typeof this {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     const apiGarageBtn = new Component('button', { id: 'api-garage-btn' }).setTextContent('/garage');
     const apiStartSecondBtn = new Component('button', { id: 'api-start-engine-btn' }).setTextContent(
@@ -35,6 +44,7 @@ export class RacePageStandalone extends Component<'div'> {
         });
     });
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     this.appendChildren([
       // new Component('header').appendChildren([
       //   new Component('h1').appendChildren([
@@ -46,6 +56,9 @@ export class RacePageStandalone extends Component<'div'> {
         `@@@ "Async Race" is under construction; Try the "http://localhost:3000/[api's]" @@@@`,
       ),
       new Component('div').appendChildren([apiGarageBtn, apiStartSecondBtn]),
+      this.scene,
     ]);
+    this.scene.draw();
+    return this;
   }
 }

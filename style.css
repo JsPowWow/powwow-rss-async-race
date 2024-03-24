@@ -25,6 +25,13 @@ a:hover {
 body {
   display: flex;
   background: black;
+  height: 95vh;
+}
+
+/*embedded async-race root page */
+#root {
+  display: flex;
+  width:100%;
 }
 
 h1 {
@@ -35,7 +42,7 @@ h1 {
 #app {
   width: 100%;
   min-height: 100vh;
-  max-width: 1280px;
+  max-width: 2400px;
   margin: 0 auto;
   padding: 2rem;
   display: flex;
@@ -50,7 +57,6 @@ h1 {
     display: flex;
     flex-direction: column;
   }
-
 }
 
 button {

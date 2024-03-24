@@ -6,7 +6,7 @@ export class TextAreaComponent extends Component<'textarea'> {
     super(textAreaElement ?? 'textarea', options);
   }
 
-  setText(text: string): typeof this {
+  public setText(text: string): typeof this {
     this.nodeElement.value = text;
     return this;
   }
