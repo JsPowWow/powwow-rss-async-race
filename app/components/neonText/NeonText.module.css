@@ -40,7 +40,7 @@
 
     & h1 {
         /*--font-size: clamp(6.25rem, 3.25rem + 15vw, 13.75rem);*/
-        --font-size: 8rem;
+        --font-size: 5rem;
         user-select: none;
         font: 700 var(--font-size)/1 "Lato", sans-serif;
         text-transform: uppercase;

@@ -24,17 +24,14 @@ export class MainWebContainerPage extends Component<'div'> {
     this.iframe = new IFrameComponent().setSource('/loading.html').toggleClass(classes.appIframe);
 
     this.appendChildren([
-      new Component('header')
-        .setStyles({ textAlign: 'left' })
-        .appendChildren([
-          new Component('h1').appendChildren([
-            new Component('span').toggleClass(classes.caption).setTextContent('WebContainers'),
-          ]),
-        ]),
       new Component('div').toggleClass(classes.appContainer).appendChildren([
         // new Component('div').toggleClass(classes.serverCodeWrapper).appendChildren([this.editor]),
         new Component('div').toggleClass(classes.raceAppContainer).appendChildren([this.iframe]),
       ]),
+      new Component('span').toggleClass(classes.caption).setTextContent('WebContainers'),
+      // new Component('h1').appendChildren([
+      //   new Component('span').toggleClass(classes.caption).setTextContent('WebContainers'),
+      // ]),
       this.terminal,
     ]);
   }
@@ -49,6 +46,8 @@ export class MainWebContainerPage extends Component<'div'> {
     const terminal = new Terminal({
       convertEol: true,
       rows: 8,
+      cols: 80,
+      disableStdin: true,
     });
 
     terminal.open(this.terminal.element);

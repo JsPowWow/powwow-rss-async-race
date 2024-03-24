@@ -8,7 +8,7 @@ export class RacePageStandalone extends Component<'div'> {
 
   constructor(root: HTMLElement) {
     super('div');
-    this.toggleClass(classes.mainPageContainer);
+    this.toggleClass(classes.racePageContainer);
     this.scene = new RaceScene();
 
     root.append(this.element);
@@ -17,9 +17,7 @@ export class RacePageStandalone extends Component<'div'> {
   public draw(): typeof this {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     const apiGarageBtn = new Component('button', { id: 'api-garage-btn' }).setTextContent('/garage');
-    const apiStartSecondBtn = new Component('button', { id: 'api-start-engine-btn' }).setTextContent(
-      '/engine?id=2&status=started',
-    );
+    const apiStartSecondBtn = new Component('button', { id: 'api-start-engine-btn' }).setTextContent('/engine');
     apiGarageBtn.element.addEventListener('click', () => {
       fetch('http://localhost:3000/garage', { method: 'GET' })
         .then((res) => res.json())
@@ -52,9 +50,6 @@ export class RacePageStandalone extends Component<'div'> {
       //   ]),
       // ]),
       new NeonText().setTextContent('Async race'),
-      new Component('div').setTextContent(
-        `@@@ "Async Race" is under construction; Try the "http://localhost:3000/[api's]" @@@@`,
-      ),
       new Component('div').appendChildren([apiGarageBtn, apiStartSecondBtn]),
       this.scene,
     ]);
