@@ -1,4 +1,5 @@
 import type { Rect, Size } from '@/geometry';
+import { Dimension } from '@/geometry';
 import { assertIsNonNullable } from '@/utils';
 
 import type { ComponentCreateOptions } from './Component';
@@ -57,9 +58,25 @@ export class CanvasComponent extends Component<'canvas'> {
     }
   }
 
-  public setSize(size: Size): typeof this {
-    this.nodeElement.width = size.width;
-    this.nodeElement.height = size.height;
+  public get width(): number {
+    return this.element.width;
+  }
+
+  public get height(): number {
+    return this.element.height;
+  }
+
+  public setSize(width: number, height: number): typeof this;
+  public setSize(size: Size): typeof this;
+  public setSize(...args: unknown[]): typeof this {
+    const [widthOrSize, height] = args;
+    if (typeof widthOrSize === 'number' && typeof height === 'number') {
+      this.nodeElement.width = widthOrSize;
+      this.nodeElement.height = height;
+    } else if (Dimension.isSize(widthOrSize)) {
+      this.nodeElement.width = widthOrSize.width;
+      this.nodeElement.height = widthOrSize.height;
+    }
 
     return this;
   }

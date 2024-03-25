@@ -90,7 +90,9 @@
                 "varsIgnorePattern": "^_",
                 "caughtErrorsIgnorePattern": "^_"
             }
-        ]
+        ],
+        "no-underscore-dangle": ["error", { "allowAfterThis": true }],
+        "no-param-reassign": ["error", { "props": false }]
     },
     "overrides": [
         {

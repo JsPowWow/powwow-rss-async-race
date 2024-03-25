@@ -2,11 +2,40 @@ const DEFAULT_LOGGER = 'default';
 const logInstances = new Map<string, ScopedLogger>();
 const enabledScopedLoggers = new Map();
 
+// TODO AR (?)
+// export interface ILogger {
+//   /**
+//    * Log a trace message, this will only be called if
+//    * {@link ITerminalOptions.logLevel} is set to trace.
+//    */
+//   trace(message: string, ...args: any[]): void;
+//   /**
+//    * Log a debug message, this will only be called if
+//    * {@link ITerminalOptions.logLevel} is set to debug or below.
+//    */
+//   debug(message: string, ...args: any[]): void;
+//   /**
+//    * Log a debug message, this will only be called if
+//    * {@link ITerminalOptions.logLevel} is set to info or below.
+//    */
+//   info(message: string, ...args: any[]): void;
+//   /**
+//    * Log a debug message, this will only be called if
+//    * {@link ITerminalOptions.logLevel} is set to warn or below.
+//    */
+//   warn(message: string, ...args: any[]): void;
+//   /**
+//    * Log a debug message, this will only be called if
+//    * {@link ITerminalOptions.logLevel} is set to error or below.
+//    */
+//   error(message: string | Error, ...args: any[]): void;
+// }
+
 export interface ScopedLogger {
-  info(...args: unknown[]): void;
-  warn(...args: unknown[]): void;
-  error(...args: unknown[]): void;
-  setEnabled(value: boolean): ScopedLogger;
+  info: (...args: unknown[]) => void;
+  warn: (...args: unknown[]) => void;
+  error: (...args: unknown[]) => void;
+  setEnabled: (value: boolean) => ScopedLogger;
   get scope(): string;
 }
 

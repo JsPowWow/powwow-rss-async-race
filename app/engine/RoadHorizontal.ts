@@ -1,7 +1,7 @@
 import { type Point, lerp } from '@/geometry';
 
 export class RoadHorizontal {
-  private readonly height: number;
+  public readonly height: number;
 
   private readonly laneCount: number;
 
@@ -15,7 +15,8 @@ export class RoadHorizontal {
 
   public readonly borders: Point[][];
 
-  constructor(y: number, height: number, laneCount = 3) {
+  constructor(args: { y: number; height: number; laneCount?: number }) {
+    const { y, height, laneCount = 3 } = args;
     const infinity = 1000000;
 
     this.height = height;
@@ -38,9 +39,13 @@ export class RoadHorizontal {
     ];
   }
 
+  public getLaneSize(): number {
+    return this.height / this.laneCount;
+  }
+
   public getLaneCenter(laneIndex: number): number {
-    const laneWidth = this.height / this.laneCount;
-    return this.top + laneWidth / 2 + Math.min(laneIndex, this.laneCount - 1) * laneWidth;
+    const laneSize = this.getLaneSize();
+    return this.top + laneSize / 2 + Math.min(laneIndex, this.laneCount - 1) * laneSize;
   }
 
   public draw(ctx: CanvasRenderingContext2D): void {

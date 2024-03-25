@@ -1,18 +1,23 @@
 
 .scene-container {
-    position: relative;
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     height: 100%;
-    overflow: hidden;
+
+    & .scene-toolbar {
+        margin-bottom: 5px;
+    }
 
     & .scene-canvas-wrapper {
-        position: absolute;
-        left: 0;
-        right: 0;
-        width: 100%;
-        height: 100%;
+        overflow: hidden;
+        display: flex;
+        /*position: relative;*/
+        /*width: 100%;*/
        & .scene-canvas {
-
+           /*position: absolute;*/
+           /*left: 0;*/
+           /*right: 0;*/
            background:lightgray;
        }
 

@@ -9,11 +9,13 @@ import type { PolyShape } from './types.ts';
 export class Car implements PolyShape {
   private readonly bounds: Rect;
 
-  private speed: number;
+  private color: CanvasFillStrokeStyles['fillStyle'];
+
+  private _speed: number;
 
   private readonly acceleration: number;
 
-  private readonly maxSpeed: number;
+  private maxSpeed: number;
 
   private readonly friction: number;
 
@@ -27,12 +29,22 @@ export class Car implements PolyShape {
 
   private polygon: Polygon;
 
-  constructor(x: number, y: number, width: number, height: number, controlType: ControlType, maxSpeed = 3) {
-    this.bounds = new Rectangle(x, y, width, height);
+  constructor(args: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    controlType: ControlType;
+    speed?: number;
+    color?: CanvasFillStrokeStyles['fillStyle'];
+  }) {
+    const { x, y, width, height, controlType, speed = 0, color = 'yellow' } = args;
 
-    this.speed = 0;
+    this.bounds = new Rectangle(x, y, width, height);
+    this.color = color;
+    this._speed = 0;
     this.acceleration = 0.2;
-    this.maxSpeed = maxSpeed;
+    this.maxSpeed = speed;
     this.friction = 0.05;
     this.carAngle = -Math.PI / 2;
     this.damaged = false;
@@ -42,6 +54,16 @@ export class Car implements PolyShape {
     }
     this.controls = new Controls(controlType);
     this.polygon = this.createPolygon();
+  }
+
+  public setColor(color: CanvasFillStrokeStyles['fillStyle']): typeof this {
+    this.color = color;
+    return this;
+  }
+
+  public setSpeed(speed: number): typeof this {
+    this.maxSpeed = speed;
+    return this;
   }
 
   public getPolygon(): Polygon {
@@ -79,11 +101,11 @@ export class Car implements PolyShape {
     }
   }
 
-  public draw(ctx: CanvasRenderingContext2D, color: CanvasFillStrokeStyles['fillStyle']): void {
+  public draw(ctx: CanvasRenderingContext2D): void {
     if (this.damaged) {
       ctx.fillStyle = 'gray';
     } else {
-      ctx.fillStyle = color;
+      ctx.fillStyle = this.color;
     }
     ctx.beginPath();
     ctx.moveTo(this.polygon[0].x, this.polygon[0].y);
@@ -136,31 +158,31 @@ export class Car implements PolyShape {
 
   private move(): void {
     if (this.controls.moveForward) {
-      this.speed += this.acceleration;
+      this._speed += this.acceleration;
     }
     if (this.controls.moveReverse) {
-      this.speed -= this.acceleration;
+      this._speed -= this.acceleration;
     }
 
-    if (this.speed > this.maxSpeed) {
-      this.speed = this.maxSpeed;
+    if (this._speed > this.maxSpeed) {
+      this._speed = this.maxSpeed;
     }
-    if (this.speed < -this.maxSpeed / 2) {
-      this.speed = -this.maxSpeed / 2;
-    }
-
-    if (this.speed > 0) {
-      this.speed -= this.friction;
-    }
-    if (this.speed < 0) {
-      this.speed += this.friction;
-    }
-    if (Math.abs(this.speed) < this.friction) {
-      this.speed = 0;
+    if (this._speed < -this.maxSpeed / 2) {
+      this._speed = -this.maxSpeed / 2;
     }
 
-    if (this.speed !== 0) {
-      const flip = this.speed > 0 ? 1 : -1;
+    if (this._speed > 0) {
+      this._speed -= this.friction;
+    }
+    if (this._speed < 0) {
+      this._speed += this.friction;
+    }
+    if (Math.abs(this._speed) < this.friction) {
+      this._speed = 0;
+    }
+
+    if (this._speed !== 0) {
+      const flip = this._speed > 0 ? 1 : -1;
       if (this.controls.moveLeft) {
         this.carAngle += 0.03 * flip;
       }
@@ -169,7 +191,7 @@ export class Car implements PolyShape {
       }
     }
 
-    this.bounds.x -= Math.sin(this.carAngle) * this.speed;
-    this.bounds.y -= Math.cos(this.carAngle) * this.speed;
+    this.bounds.x -= Math.sin(this.carAngle) * this._speed;
+    this.bounds.y -= Math.cos(this.carAngle) * this._speed;
   }
 }

@@ -1,4 +1,4 @@
-import type { ConstructorOf, Nil, Nullable } from './types';
+import type { AnyVoidFunction, ConstructorOf, Nil, Nullable } from './types';
 
 export function isNil<T>(value: Nullable<T>): value is Nil {
   return value === null || value === undefined;
@@ -61,3 +61,25 @@ export const toShuffledArray = <T>(arr: Array<T>): Array<T> => {
   }
   return result;
 };
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function debounce<T extends AnyVoidFunction>(func: T, wait: number, immediate?: boolean) {
+  let timeout: ReturnType<typeof setTimeout> | 0;
+  // eslint-disable-next-line func-names
+  return function <U>(this: U, ...args: Parameters<typeof func>): void {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const context = this;
+    if (timeout) {
+      clearTimeout(timeout);
+    }
+    if (immediate && !timeout) {
+      func.apply(context, args);
+    }
+    timeout = setTimeout(() => {
+      timeout = 0;
+      if (!immediate) {
+        func.apply(context, args);
+      }
+    }, wait);
+  };
+}

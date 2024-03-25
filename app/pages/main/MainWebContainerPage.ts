@@ -1,4 +1,5 @@
 import type { FileSystemTree } from '@webcontainer/api';
+import { FitAddon } from '@xterm/addon-fit';
 import { Terminal } from 'xterm';
 
 import { webContainer } from '@/api/web-container';
@@ -28,7 +29,7 @@ export class MainWebContainerPage extends Component<'div'> {
         // new Component('div').toggleClass(classes.serverCodeWrapper).appendChildren([this.editor]),
         new Component('div').toggleClass(classes.raceAppContainer).appendChildren([this.iframe]),
       ]),
-      new Component('span').toggleClass(classes.caption).setTextContent('WebContainers'),
+      // new Component('span').toggleClass(classes.caption).setTextContent('WebContainers'),
       // new Component('h1').appendChildren([
       //   new Component('span').toggleClass(classes.caption).setTextContent('WebContainers'),
       // ]),
@@ -43,14 +44,19 @@ export class MainWebContainerPage extends Component<'div'> {
     //     webContainer.writeToFile({ path: '/index.js', content: String(e.currentTarget.value) }).catch(noop);
     //   }
     // });
+
     const terminal = new Terminal({
       convertEol: true,
       rows: 8,
       cols: 80,
       disableStdin: true,
     });
+    const fitAddon = new FitAddon();
+    terminal.loadAddon(fitAddon);
 
     terminal.open(this.terminal.element);
+    fitAddon.fit();
+
     // Call only once
     await webContainer.init(files, (log) => terminal.write(log));
 

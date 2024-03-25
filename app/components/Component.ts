@@ -207,9 +207,9 @@ export class Component<Tag extends HTMLElementTag> {
     return this;
   }
 
-  public observe(onResize: ResizeObserverCallback): typeof this {
+  public observe(onResize: (entry: ResizeObserverEntry) => void): typeof this {
     this.unobserve();
-    this.resizeObserver = new ResizeObserver(onResize);
+    this.resizeObserver = new ResizeObserver((entries) => onResize(entries[0]));
     this.resizeObserver.observe(this.nodeElement);
     return this;
   }

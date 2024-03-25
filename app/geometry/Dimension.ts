@@ -7,6 +7,19 @@ export class Dimension<Owner = unknown> implements Size {
 
   private readonly dimensionOwner: Owner | undefined;
 
+  public static isSize(value: unknown): value is Size {
+    return Boolean(
+      value &&
+        typeof value === 'object' &&
+        'width' in value &&
+        typeof value.width === 'number' &&
+        value &&
+        typeof value === 'object' &&
+        'height' in value &&
+        typeof value.height === 'number',
+    );
+  }
+
   public static from<Owner>(src: Size, owner?: Owner): Dimension {
     return new Dimension<Owner>(src.width, src.height, owner);
   }
