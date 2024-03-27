@@ -1,6 +1,6 @@
-import type { RecordOf } from '@/utils';
+import type { AnyValue } from '@/utils';
 
-export type EventMap = RecordOf<string>;
+export type EventMap = Record<string, AnyValue>;
 export type EventKey<Events extends EventMap> = string & keyof Events;
 export type EventListener<Event> = (event: Event) => void;
 

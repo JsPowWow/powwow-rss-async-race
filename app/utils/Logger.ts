@@ -30,11 +30,13 @@ const enabledScopedLoggers = new Map();
 //    */
 //   error(message: string | Error, ...args: any[]): void;
 // }
-
-export interface ScopedLogger {
+export interface ILogger {
   info: (...args: unknown[]) => void;
   warn: (...args: unknown[]) => void;
   error: (...args: unknown[]) => void;
+}
+
+export interface ScopedLogger extends ILogger {
   setEnabled: (value: boolean) => ScopedLogger;
   get scope(): string;
 }
@@ -65,31 +67,31 @@ class ConsoleLoggerScoped implements ScopedLogger {
     return isLoggerEnabled(this);
   }
 
-  public setEnabled(value: boolean): typeof this {
+  public setEnabled = (value: boolean): typeof this => {
     setLoggerEnabled(this, value);
     return this;
-  }
+  };
 
-  public info(...args: unknown[]): void {
+  public info = (...args: unknown[]): void => {
     if (isLoggerEnabled(this)) {
       // eslint-disable-next-line  no-console
       console.info(`[[${this.loggerScope}]]\t`, ...args);
     }
-  }
+  };
 
-  public warn(...args: unknown[]): void {
+  public warn = (...args: unknown[]): void => {
     if (isLoggerEnabled(this)) {
       // eslint-disable-next-line  no-console
       console.warn(`[[${this.loggerScope}]]\t`, ...args);
     }
-  }
+  };
 
-  public error(...args: unknown[]): void {
+  public error = (...args: unknown[]): void => {
     if (isLoggerEnabled(this)) {
       // eslint-disable-next-line  no-console
       console.error(`[[${this.loggerScope}]]\t`, ...args);
     }
-  }
+  };
 }
 
 export const getLogger = (scope = DEFAULT_LOGGER): ScopedLogger => {
