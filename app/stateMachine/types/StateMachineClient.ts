@@ -1,5 +1,6 @@
 import type { Emitter } from '@/event-emitter';
 
+import type { IState } from './State.ts';
 import type { StateMachineEvent, StateMachineEventListener } from './StateMachine.ts';
 
 export const enum StateMachineClientEvents {
@@ -17,8 +18,18 @@ export type Unsubscribe = () => void;
 
 export interface IStateMachineClient<State> extends Emitter<StateMachineClientEventsMap<State>> {
   readonly state: State;
-  onStateEnter(state: State, callBack: StateMachineEventListener<'stateEnter', State>): Unsubscribe;
-  onStateLeave(state: State, callBack: StateMachineEventListener<'stateLeave', State>): Unsubscribe;
-  onStateTransition(from: State, to: State, callBack: StateMachineEventListener<'stateTransition', State>): Unsubscribe;
+  onStateEnter<Data>(
+    state: State extends IState<Data> ? State['state'] : State,
+    callBack: StateMachineEventListener<'stateEnter', State>,
+  ): Unsubscribe;
+  onStateLeave<Data>(
+    state: State extends IState<Data> ? State['state'] : State,
+    callBack: StateMachineEventListener<'stateLeave', State>,
+  ): Unsubscribe;
+  onStateTransition<Data>(
+    from: State extends IState<Data> ? State['state'] : State,
+    to: State extends IState<Data> ? State['state'] : State,
+    callBack: StateMachineEventListener<'stateTransition', State>,
+  ): Unsubscribe;
   onStateChange(callBack: StateMachineEventListener<'stateChange', State>): Unsubscribe;
 }

@@ -21,5 +21,5 @@ export type StateMachineEventListener<Type, State> = (event: StateMachineEvent<T
 
 export interface IStateMachine<State> extends Emitter<StateMachineEventsMap<State>> {
   get state(): State;
-  isInState(state: State): boolean;
+  isInState(state: State): state is State;
 }

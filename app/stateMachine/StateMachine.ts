@@ -1,38 +1,68 @@
-import type { BaseStateMachineInput } from './BaseStateMachine.ts';
-import { BaseStateMachine } from './BaseStateMachine.ts';
+import { EventEmitter } from '@/event-emitter';
+import type { ILogger, WithDebugOptions } from '@/utils';
+
+import type { IStateMachine, StateMachineEventsMap } from './types/StateMachine.ts';
 import { StateMachineEvents } from './types/StateMachine.ts';
-import type { Transitions } from './types/Transition.ts';
+import type { IStateMachineDefinition } from './types/StateMachineDefinition.ts';
 
-export class StateMachine<S> extends BaseStateMachine<S> {
-  private readonly transitions: Transitions<S>;
+export type BaseStateMachineInput<State> = WithDebugOptions<{
+  name?: string;
+  definition: IStateMachineDefinition<State>;
+}>;
 
-  constructor(input: BaseStateMachineInput<S> & { transitions: Transitions<S> }) {
-    super(input);
+export class StateMachine<S> extends EventEmitter<StateMachineEventsMap<S>> implements IStateMachine<S> {
+  protected logger?: ILogger;
 
-    this.transitions = input.transitions;
+  protected readonly name: string;
+
+  protected readonly definition: IStateMachineDefinition<S>;
+
+  protected currentState: S;
+
+  constructor(input: BaseStateMachineInput<S>) {
+    super();
+
+    const { name = '', definition } = input;
+    this.name = name;
+    if (input.debug) {
+      this.logger = input.logger;
+    }
+    this.definition = definition;
+
+    this.currentState = definition.initialState;
   }
 
-  public override setState(newState: S): boolean {
-    this.assertCanGoToState(newState);
-    this.logger?.info(`${this.name} change ${String(this.currentState)} -> ${String(newState)}`);
-    const from = this.currentState;
-    this.currentState = newState;
+  public get state(): S {
+    return this.currentState;
+  }
+
+  public isInState(state: S): state is S {
+    return this.currentState === state;
+  }
+
+  public setState(newState: S): typeof this {
+    const prevState = this.currentState;
+    try {
+      const nextState = this.definition.getNextState(this.currentState, newState);
+      this.currentState = nextState;
+    } catch (setStateError) {
+      this.logger?.error(
+        `${this.name}: Error occurred on (${String(prevState)} -> ${String(this.currentState)}) setState`,
+        setStateError,
+      );
+      return this;
+    }
+
+    this.logger?.info(`${this.name} changed ${String(this.currentState)} -> ${String(newState)}`);
 
     try {
-      this.emit(StateMachineEvents.stateChange, { type: 'stateChange', from, to: newState });
-      return true;
-    } catch (e) {
+      this.emit(StateMachineEvents.stateChange, { type: 'stateChange', from: prevState, to: this.currentState });
+    } catch (error) {
       this.logger?.error(
-        `${this.name}: Uncaught error occurred in listener on ${String(from)} -> ${String(newState)}`,
-        e,
+        `${this.name}: Error occurred on (${String(prevState)} -> ${String(this.currentState)}) event emit`,
+        error,
       );
-      return false;
     }
-  }
-
-  private assertCanGoToState(newState: S): void {
-    if (!this.transitions.validate(newState)) {
-      throw new Error(`No defined transition found from ${String(this.currentState)} to ${String(newState)}`);
-    }
+    return this;
   }
 }
