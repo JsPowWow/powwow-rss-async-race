@@ -1,1 +1,2 @@
-export * from './race-api.ts';
+export * from './raceApi.ts';
+export * from './errors.ts';
