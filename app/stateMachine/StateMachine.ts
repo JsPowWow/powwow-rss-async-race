@@ -43,17 +43,15 @@ export class StateMachine<S> extends EventEmitter<StateMachineEventsMap<S>> impl
   public setState(newState: S): typeof this {
     const prevState = this.currentState;
     try {
-      const nextState = this.definition.getNextState(this.currentState, newState);
-      this.currentState = nextState;
+      this.currentState = this.definition.getNextState(this.currentState, newState);
+      this.logger?.info(`${this.name} state changed ${String(prevState)} -> ${String(this.currentState)}`);
     } catch (setStateError) {
       this.logger?.error(
-        `${this.name}: Error occurred on (${String(prevState)} -> ${String(this.currentState)}) setState`,
+        `${this.name}:setState(.. Error occurred on (${String(prevState)} -> ${String(newState)})`,
         setStateError,
       );
       return this;
     }
-
-    this.logger?.info(`${this.name} changed ${String(this.currentState)} -> ${String(newState)}`);
 
     try {
       this.emit(StateMachineEvents.stateChange, { type: 'stateChange', from: prevState, to: this.currentState });

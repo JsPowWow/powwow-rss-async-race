@@ -2,10 +2,15 @@ import { EventEmitter } from '@/event-emitter';
 import type { ScopedLogger } from '@/utils';
 import { getLogger } from '@/utils';
 
-import { State } from './state/State.ts';
 import type { IState } from './types/State.ts';
 import type { IStateMachine, StateMachineEventListener } from './types/StateMachine.ts';
 import type { IStateMachineClient, StateMachineClientEventsMap, Unsubscribe } from './types/StateMachineClient.ts';
+
+const compareStates = (stateA: unknown, stateB: unknown): boolean => {
+  const sA = stateA && typeof stateA === 'object' && 'state' in stateA ? stateA.state : stateA;
+  const sB = stateB && typeof stateB === 'object' && 'state' in stateB ? stateB.state : stateB;
+  return sA === sB;
+};
 
 export class StateMachineClient<State>
   extends EventEmitter<StateMachineClientEventsMap<State>>
@@ -38,7 +43,7 @@ export class StateMachineClient<State>
     callBack: StateMachineEventListener<'stateEnter', State>,
   ): Unsubscribe {
     const onEnterStateImpl: typeof callBack = (event) => {
-      if (State.areSameStateName(event.to, enterState)) {
+      if (compareStates(event.to, enterState)) {
         callBack(event);
       }
     };
@@ -53,7 +58,7 @@ export class StateMachineClient<State>
     callBack: StateMachineEventListener<'stateLeave', State>,
   ): Unsubscribe {
     const onLeaveStateImpl: typeof callBack = (event) => {
-      if (State.areSameStateName(event.from, leaveState)) {
+      if (compareStates(event.from, leaveState)) {
         callBack(event);
       }
     };
@@ -69,7 +74,7 @@ export class StateMachineClient<State>
     callBack: StateMachineEventListener<'stateTransition', State>,
   ): Unsubscribe {
     const onTransitionImpl: typeof callBack = (event) => {
-      if (State.areSameStateName(event.from, from) && State.areSameStateName(event.to, to)) {
+      if (compareStates(event.from, from) && compareStates(event.to, to)) {
         callBack(event);
       }
     };
