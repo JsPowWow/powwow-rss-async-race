@@ -1,15 +1,35 @@
 import type { Point, Polygon, Rect } from '@/geometry';
 import { Rectangle, polysIntersect } from '@/geometry';
+import { assertIsNonNullable } from '@/utils';
 
 import type { ControlType } from './Controls.js';
 import { Controls } from './Controls.js';
 import { Sensor } from './Sensor.js';
 import type { PolyShape } from './types.ts';
 
+export type CarInput = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  controlType: ControlType;
+  startAngle?: number;
+  name?: string;
+  speed?: number;
+  color?: CanvasFillStrokeStyles['fillStyle'];
+  skin?: {
+    img?: HTMLImageElement;
+  };
+};
+
+export const LOCAL_SPEED = 0.056916355582932183;
+
 export class Car implements PolyShape {
   private readonly bounds: Rect;
 
-  private color: CanvasFillStrokeStyles['fillStyle'];
+  private readonly color: CanvasFillStrokeStyles['fillStyle'];
+
+  public readonly name: string;
 
   private _speed: number;
 
@@ -29,24 +49,44 @@ export class Car implements PolyShape {
 
   private polygon: Polygon;
 
-  constructor(args: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    controlType: ControlType;
-    speed?: number;
-    color?: CanvasFillStrokeStyles['fillStyle'];
-  }) {
-    const { x, y, width, height, controlType, speed = 0, color = 'yellow' } = args;
+  private readonly mask?: HTMLCanvasElement;
 
+  private readonly img?: HTMLImageElement;
+
+  constructor(args: CarInput) {
+    const { x, y, width, height, controlType, speed = 0, color = 'yellow', name = '', startAngle = 0 } = args;
+    this.name = name;
     this.bounds = new Rectangle(x, y, width, height);
+
     this.color = color;
+    if (args.skin?.img) {
+      try {
+        this.img = args.skin?.img;
+
+        this.mask = document.createElement('canvas');
+        this.mask.width = width;
+        this.mask.height = height;
+
+        const maskCtx = this.mask.getContext('2d');
+        assertIsNonNullable(maskCtx);
+
+        assertIsNonNullable(this.img);
+        maskCtx.fillStyle = color;
+        maskCtx.rect(0, 0, this.width, this.height);
+        maskCtx.fill();
+
+        maskCtx.globalCompositeOperation = 'destination-atop';
+        maskCtx.drawImage(this.img, 0, 0, this.width, this.height);
+      } catch (e) {
+        // Nothing atm
+      }
+    }
+
     this._speed = 0;
     this.acceleration = 0.2;
     this.maxSpeed = speed;
     this.friction = 0.05;
-    this.carAngle = -Math.PI / 2;
+    this.carAngle = startAngle;
     this.damaged = false;
 
     if (controlType !== 'SELF') {
@@ -54,11 +94,6 @@ export class Car implements PolyShape {
     }
     this.controls = new Controls(controlType);
     this.polygon = this.createPolygon();
-  }
-
-  public setColor(color: CanvasFillStrokeStyles['fillStyle']): typeof this {
-    this.color = color;
-    return this;
   }
 
   public setSpeed(speed: number): typeof this {
@@ -94,14 +129,28 @@ export class Car implements PolyShape {
     if (!this.damaged) {
       this.move();
       this.polygon = this.createPolygon();
+      const prevD = this.damaged;
       this.damaged = this.assessDamage(roadBorders, traffic);
+      if (!prevD && this.damaged) {
+        // const endTime = performance.now();
+        // const len = this.x - this.startX;
+        // const time = endTime - this.startTime;
+        // console.timeEnd(`car${this.name}`);
+        // console.log(`$time ${time} len ${len} speed ${len / time}`);
+        // console.log('pass ', len);
+      }
     }
     if (this.sensor) {
       this.sensor.update(roadBorders, traffic);
     }
   }
 
-  public draw(ctx: CanvasRenderingContext2D): void {
+  public draw(ctx: CanvasRenderingContext2D, options?: { drawSensor: boolean }): void {
+    if (this.mask && this.img) {
+      this.drawSkin(ctx, options);
+      return;
+    }
+
     if (this.damaged) {
       ctx.fillStyle = 'gray';
     } else {
@@ -116,6 +165,30 @@ export class Car implements PolyShape {
 
     if (this.sensor) {
       this.sensor.draw(ctx);
+    }
+  }
+
+  private drawSkin(ctx: CanvasRenderingContext2D, options?: { drawSensor: boolean }): void {
+    if (this.sensor && options?.drawSensor) {
+      this.sensor.draw(ctx);
+    }
+
+    ctx.save();
+
+    try {
+      assertIsNonNullable(this.mask);
+      assertIsNonNullable(this.img);
+      ctx.translate(this.x, this.y);
+      ctx.rotate(-this.angle);
+      if (!this.damaged || !this.sensor) {
+        ctx.drawImage(this.mask, -this.width / 2, -this.height / 2, this.width, this.height);
+        ctx.globalCompositeOperation = 'multiply';
+      }
+      ctx.drawImage(this.img, -this.width / 2, -this.height / 2, this.width, this.height);
+    } catch (_e) {
+      // nothing
+    } finally {
+      ctx.restore();
     }
   }
 
@@ -135,23 +208,24 @@ export class Car implements PolyShape {
 
   private createPolygon(): Polygon {
     const points = [];
-    const rad = Math.hypot(this.bounds.width, this.bounds.height) / 2;
-    const alpha = Math.atan2(this.bounds.width, this.bounds.height);
+    const { bounds } = this;
+    const rad = Math.hypot(bounds.width, bounds.height) / 2;
+    const alpha = Math.atan2(bounds.width, bounds.height);
     points.push({
-      x: this.bounds.x - Math.sin(this.carAngle - alpha) * rad,
-      y: this.bounds.y - Math.cos(this.carAngle - alpha) * rad,
+      x: bounds.x - Math.sin(this.carAngle - alpha) * rad,
+      y: bounds.y - Math.cos(this.carAngle - alpha) * rad,
     });
     points.push({
-      x: this.bounds.x - Math.sin(this.carAngle + alpha) * rad,
-      y: this.bounds.y - Math.cos(this.carAngle + alpha) * rad,
+      x: bounds.x - Math.sin(this.carAngle + alpha) * rad,
+      y: bounds.y - Math.cos(this.carAngle + alpha) * rad,
     });
     points.push({
-      x: this.bounds.x - Math.sin(Math.PI + this.carAngle - alpha) * rad,
-      y: this.bounds.y - Math.cos(Math.PI + this.carAngle - alpha) * rad,
+      x: bounds.x - Math.sin(Math.PI + this.carAngle - alpha) * rad,
+      y: bounds.y - Math.cos(Math.PI + this.carAngle - alpha) * rad,
     });
     points.push({
-      x: this.bounds.x - Math.sin(Math.PI + this.carAngle + alpha) * rad,
-      y: this.bounds.y - Math.cos(Math.PI + this.carAngle + alpha) * rad,
+      x: bounds.x - Math.sin(Math.PI + this.carAngle + alpha) * rad,
+      y: bounds.y - Math.cos(Math.PI + this.carAngle + alpha) * rad,
     });
     return points;
   }

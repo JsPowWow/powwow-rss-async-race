@@ -1,4 +1,5 @@
 import { Component, NeonText } from '@/components';
+import logger from '@/logger';
 import { RaceScene, RaceSceneController } from '@/views/race-scene';
 
 import classes from './RacePageStandalone.module.css';
@@ -18,17 +19,9 @@ export class RacePageStandalone extends Component<'div'> {
   public draw(): typeof this {
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    this.appendChildren([
-      // new Component('header').appendChildren([
-      //   new Component('h1').appendChildren([
-      //     new Component('span').toggleClass(classes.caption).setTextContent('Async Race'),
-      //   ]),
-      // ]),
-      new NeonText().setTextContent('Async race'),
-      this.scene,
-    ]);
+    this.appendChildren([new NeonText().setTextContent('Async race'), this.scene]);
 
-    new RaceSceneController(this.scene).initialize();
+    new RaceSceneController(this.scene).initialize().catch(logger.error);
 
     return this;
   }

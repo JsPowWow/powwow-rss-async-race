@@ -15,7 +15,9 @@ export const getImageAsync = (source: string): Promise<HTMLImageElement> => {
     image.onload = (): void => {
       resolve(image);
     };
-    image.onerror = reject;
+    image.onerror = (e): void => {
+      reject(e);
+    };
     image.src = source;
   });
 };

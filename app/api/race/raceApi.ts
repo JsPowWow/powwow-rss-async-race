@@ -3,11 +3,14 @@ import { fromPromise } from '@sweet-monads/either';
 import type * as v from 'valibot';
 import { parse } from 'valibot';
 
+import { getImageAsync } from '@/utils';
+
 import { validateResponseStatus } from './errors.ts';
 import type { GarageCarResponseSchema } from './schema.ts';
 import { CarStartEngineSchema, GetGarageCarsResponseSchema, SuccessResponseSchema } from './schema.ts';
 
 const API_URL = import.meta.env.VITE_RACE_API_URL;
+const ASSETS_URL = import.meta.env.VITE_ASSETS_URL;
 
 export type GarageCarResponse = v.Output<typeof GarageCarResponseSchema>;
 export type GetGarageCarsResponse = v.Output<typeof GetGarageCarsResponseSchema>;
@@ -25,7 +28,7 @@ export const withCarId =
 export const isFulfilled = <T>(s: PromiseSettledResult<T>): s is PromiseFulfilledResult<T> => s.status === 'fulfilled';
 export const toFulfilledValue = <T>(r: PromiseFulfilledResult<T>): T => r.value;
 
-export const getGarage = async (): Promise<Either<Error, GetGarageCarsResponse>> => {
+export const getGarageCars = async (): Promise<Either<Error, GetGarageCarsResponse>> => {
   return fromPromise<Error, GetGarageCarsResponse>(
     fetch(`${API_URL}/garage`, { method: 'GET' })
       .then((r) => r.json())
@@ -56,3 +59,6 @@ export const setCarEngineDrive = async (payload: {
       .then(withCarId(payload.id)),
   );
 };
+
+export const getCarImage = async (car: 'car1' | 'car2' | 'car3'): Promise<HTMLImageElement> =>
+  getImageAsync(`${ASSETS_URL}/${car}.png`);

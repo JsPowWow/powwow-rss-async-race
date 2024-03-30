@@ -15,8 +15,8 @@ export class RoadHorizontal {
 
   public readonly borders: Point[][];
 
-  constructor(args: { y: number; height: number; laneCount?: number }) {
-    const { y, height, laneCount = 3 } = args;
+  constructor(args: { y: number; height: number; laneCount?: number; endPos?: number }) {
+    const { y, height, laneCount = 3, endPos } = args;
     const infinity = 1000000;
 
     this.height = height;
@@ -37,6 +37,12 @@ export class RoadHorizontal {
       [topLeft, topRight],
       [bottomLeft, bottomRight],
     ];
+    if (endPos) {
+      this.borders.push([
+        { x: endPos, y: this.top },
+        { x: endPos, y: this.bottom },
+      ]);
+    }
   }
 
   public getLaneSize(): number {
