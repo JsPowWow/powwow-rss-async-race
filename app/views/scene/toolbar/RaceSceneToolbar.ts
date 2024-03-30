@@ -2,24 +2,22 @@ import { P, match } from 'ts-pattern';
 
 import { Component } from '@/components';
 
-import classes from './RaceScene.module.css';
+import classes from '../RaceScene.module.css';
 
 export type ActionCallback = (action: ToolbarAction) => void;
 export type ToolbarAction = (typeof TOOLBAR_ACTIONS)[number];
-const TOOLBAR_ACTIONS = ['reset', 'start', 'stop'] as const;
+const TOOLBAR_ACTIONS = ['reset', 'start'] as const;
 
 type ToolbarActions<T> = Partial<Record<ToolbarAction, T>>;
 
 const enableButton = (btn: Component<'button'>) => {
   return (enable?: boolean): void => {
-    btn.element.disabled = !enable ?? true;
+    btn.element.disabled = !enable;
   };
 };
 
 export class RaceSceneToolbar extends Component<'div'> {
   private readonly startBtn: Component<'button'>;
-
-  private readonly stopBtn: Component<'button'>;
 
   private readonly resetBtn: Component<'button'>;
 
@@ -29,12 +27,11 @@ export class RaceSceneToolbar extends Component<'div'> {
     super('div');
     this.toggleClass(classes.sceneToolbar);
     this.startBtn = this.appendChild(new Component('button', { id: 'start-race-btn' }).setTextContent('Start'));
-    this.stopBtn = this.appendChild(new Component('button', { id: 'stop-race-btn' }).setTextContent('Stop'));
     this.resetBtn = this.appendChild(new Component('button', { id: 'reset-race-btn' }).setTextContent('Reset'));
 
-    this.startBtn.element.addEventListener('click', this.clickHandler('start'));
-    this.stopBtn.element.addEventListener('click', this.clickHandler('stop'));
-    this.resetBtn.element.addEventListener('click', this.clickHandler('reset'));
+    this.startBtn.element.addEventListener('click', this.onButtonClickHandler('start'));
+    this.resetBtn.element.addEventListener('click', this.onButtonClickHandler('reset'));
+    this.setEnabled({ reset: true, start: false });
   }
 
   public onAction(cb: ActionCallback): typeof this {
@@ -46,7 +43,6 @@ export class RaceSceneToolbar extends Component<'div'> {
     Object.entries(buttons).forEach((entry) => {
       match(Object.fromEntries([entry]))
         .with({ start: P.select() }, enableButton(this.startBtn))
-        .with({ stop: P.select() }, enableButton(this.stopBtn))
         .with({ reset: P.select() }, enableButton(this.resetBtn))
         .run();
     });
@@ -54,7 +50,7 @@ export class RaceSceneToolbar extends Component<'div'> {
     return this;
   }
 
-  private clickHandler =
+  private onButtonClickHandler =
     (btn: ToolbarAction) =>
     (_event: MouseEvent): void => {
       this.onActionCallback?.(btn);

@@ -1,4 +1,3 @@
-
 .scene-container {
     display: flex;
     flex-direction: column;
@@ -7,20 +6,41 @@
 
     & .scene-toolbar {
         margin-bottom: 5px;
+        display: flex;
+        gap: 5px;
+
+        button {
+            border-radius: 8px;
+            border: 1px solid transparent;
+            padding: 0.6em 1.2em;
+            font-size: 1em;
+            font-weight: 500;
+            font-family: inherit;
+            background: #1a1a1a;
+            cursor: pointer;
+            transition: border-color 0.25s;
+        }
+        button:hover {
+            border-color: #646cff;
+        }
+        button:focus,
+        button:focus-visible {
+            outline: 4px auto -webkit-focus-ring-color;
+        }
+
     }
 
-    & .scene-canvas-wrapper {
+    & .scene-canvas-container {
         overflow: hidden;
         display: flex;
-        /*position: relative;*/
-        /*width: 100%;*/
+        position: relative;
+        width: 100%;
+        height: 100%;
        & .scene-canvas {
-           /*position: absolute;*/
-           /*left: 0;*/
-           /*right: 0;*/
-           background:lightgray;
+           position: absolute;
+           left: 0;
+           right: 0;
        }
-
     }
 
 }

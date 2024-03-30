@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2016",
     "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
@@ -31,6 +31,8 @@
       "@/utils": ["./app/utils/index.ts"],
       "@/geometry": ["./app/geometry/index.ts"],
       "@/components": ["./app/components/index.ts"],
+      "@/state-machine": ["./app/stateMachine/index.ts"],
+      "@/event-emitter": ["./app/eventEmitter/index.ts"],
       "@/engine": ["./app/engine/index.ts"],
       "@/views/race-scene": ["./app/views/scene/index.ts"],
       "@/pages/main": ["./app/pages/main/index.ts"],
