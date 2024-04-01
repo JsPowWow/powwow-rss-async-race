@@ -4,7 +4,6 @@ import { EventEmitter } from '@/event-emitter';
 import { StateMachineClient } from '@/state-machine';
 import { noop } from '@/utils';
 
-import type { CarsToolbar } from './CarsToolbar.ts';
 import type { RaceSceneToolbar, SceneToolbarAction } from './RaceSceneToolbar.ts';
 import type { RaceScene } from '../RaceScene.ts';
 import type { RaceSceneStateMachine } from '../RaceSceneState.ts';
@@ -15,11 +14,11 @@ export class RaceSceneToolbarController extends EventEmitter<{ onSceneToolbarAct
 
   private readonly raceToolbar: RaceSceneToolbar;
 
-  private readonly carsToolbar: CarsToolbar;
+  // private readonly carsToolbar: CarsToolbar;
 
   constructor(raceState: RaceSceneStateMachine, scene: RaceScene) {
     super();
-    this.carsToolbar = scene.carsToolbar;
+    // this.carsToolbar = scene.carsToolbar;
     this.raceToolbar = scene.toolbar;
     this.raceToolbar.onAction(this.onSceneToolbarAction);
     this.toolbarStateClient = new StateMachineClient(raceState);

@@ -13,7 +13,7 @@ export class CarsToolbar extends Component<'div'> {
     this.destroyChildren();
     traffic.cars().forEach((_c: TrafficCar) => {
       const toggler = this.appendChild(new RedSwitch().setVariant('small'));
-      toggler.on('onChange', (value) => {
+      toggler.on('onChange', (_value) => {
         // TODO
       });
     });
