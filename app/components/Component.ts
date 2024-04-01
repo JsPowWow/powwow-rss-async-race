@@ -234,7 +234,7 @@ export class Component<Tag extends HTMLElementTag> {
   /**
    * Destroys all child components associated with the current component.
    */
-  protected destroyChildren(): void {
+  public destroyChildren(): void {
     this.getChildren().forEach((child) => {
       child.destroy();
     });

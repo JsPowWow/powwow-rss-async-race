@@ -1,5 +1,15 @@
 import { type Point, lerp } from '@/geometry';
 
+export type RoadHorizontalInput = {
+  y: number;
+  height: number;
+  laneCount: number;
+  endPos?: number;
+  skin?: {
+    img?: HTMLImageElement;
+  };
+};
+
 export class RoadHorizontal {
   public readonly height: number;
 
@@ -13,9 +23,11 @@ export class RoadHorizontal {
 
   private readonly bottom: number;
 
+  private readonly skin?: HTMLImageElement;
+
   public readonly borders: Point[][];
 
-  constructor(args: { y: number; height: number; laneCount?: number; endPos?: number }) {
+  constructor(args: RoadHorizontalInput) {
     const { y, height, laneCount = 3, endPos } = args;
     const infinity = 1000000;
 
@@ -28,6 +40,7 @@ export class RoadHorizontal {
     this.top = y - height / 2;
     this.bottom = y + height / 2;
 
+    this.skin = args.skin?.img;
     const topLeft = { x: this.left, y: this.top };
     const topRight = { x: this.right, y: this.top };
     const bottomLeft = { x: this.left, y: this.bottom };
@@ -55,6 +68,14 @@ export class RoadHorizontal {
   }
 
   public draw(ctx: CanvasRenderingContext2D): void {
+    if (this.skin) {
+      const pattern = ctx.createPattern(this.skin, 'repeat');
+      if (pattern) {
+        ctx.fillStyle = pattern;
+        ctx.fillRect(0, this.top - 10, this.right, this.bottom); // context.fillRect(x, y, width, height);
+      }
+    }
+
     ctx.lineWidth = 5;
     ctx.strokeStyle = 'white';
 

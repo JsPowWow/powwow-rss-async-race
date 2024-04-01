@@ -62,3 +62,5 @@ export const setCarEngineDrive = async (payload: {
 
 export const getCarImage = async (car: 'car1' | 'car2' | 'car3'): Promise<HTMLImageElement> =>
   getImageAsync(`${ASSETS_URL}/${car}.png`);
+
+export const getRoadImage = async (): Promise<HTMLImageElement> => getImageAsync(`${ASSETS_URL}/roadtexture.jpg`);
