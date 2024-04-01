@@ -1,4 +1,5 @@
 import type { GetGarageCarsResponse } from '@/api/race';
+import type { RoadHorizontalInput } from '@/engine';
 import { Car, RoadHorizontal } from '@/engine';
 import type { Size } from '@/geometry';
 import { Dimension } from '@/geometry';
@@ -7,8 +8,10 @@ import { getLogger } from '@/utils';
 import type { CarsCreateOptions } from './Traffic.ts';
 import { TrafficCar } from './TrafficCar.ts';
 
-const createRoad = (roadSize: number, laneCount: number, endPos?: number): RoadHorizontal => {
+const createRoad = (input: Omit<RoadHorizontalInput, 'y' | 'height'> & { roadSize: number }): RoadHorizontal => {
+  const { laneCount, endPos, roadSize } = input;
   return new RoadHorizontal({
+    ...input,
     y: roadSize / 2,
     height: roadSize * 0.9,
     laneCount,
@@ -48,11 +51,16 @@ export const createFromResponse = (
   heroCar: Car;
   road: RoadHorizontal;
 } => {
-  const { getHeroCarParams, roadLineSize = 75, roadFinishPos } = options;
+  const { getHeroCarParams, roadLineSize = 75, roadFinishPos, getRoadParams } = options;
 
   const roadSize = cars.length * roadLineSize;
 
-  const road = createRoad(roadSize, cars.length + 1, roadFinishPos);
+  const road = createRoad({
+    ...getRoadParams(),
+    laneCount: cars.length + 1,
+    endPos: roadFinishPos,
+    roadSize,
+  });
 
   const carSize = new Dimension(30, /* road.getLaneSize() * 0.7 */ 60);
 

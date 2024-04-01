@@ -4,11 +4,11 @@ import { Component } from '@/components';
 
 import classes from '../RaceScene.module.css';
 
-export type ActionCallback = (action: ToolbarAction) => void;
-export type ToolbarAction = (typeof TOOLBAR_ACTIONS)[number];
+export type ActionCallback = (action: SceneToolbarAction) => void;
+export type SceneToolbarAction = (typeof TOOLBAR_ACTIONS)[number];
 const TOOLBAR_ACTIONS = ['reset', 'start'] as const;
 
-type ToolbarActions<T> = Partial<Record<ToolbarAction, T>>;
+type ToolbarActions<T> = Partial<Record<SceneToolbarAction, T>>;
 
 const enableButton = (btn: Component<'button'>) => {
   return (enable?: boolean): void => {
@@ -51,7 +51,7 @@ export class RaceSceneToolbar extends Component<'div'> {
   }
 
   private onButtonClickHandler =
-    (btn: ToolbarAction) =>
+    (btn: SceneToolbarAction) =>
     (_event: MouseEvent): void => {
       this.onActionCallback?.(btn);
     };

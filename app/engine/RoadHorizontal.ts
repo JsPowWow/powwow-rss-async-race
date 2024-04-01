@@ -28,7 +28,7 @@ export class RoadHorizontal {
   public readonly borders: Point[][];
 
   constructor(args: RoadHorizontalInput) {
-    const { y, height, laneCount = 3, endPos } = args;
+    const { y, height, laneCount = 3 } = args;
     const infinity = 1000000;
 
     this.height = height;
@@ -50,12 +50,6 @@ export class RoadHorizontal {
       [topLeft, topRight],
       [bottomLeft, bottomRight],
     ];
-    if (endPos) {
-      this.borders.push([
-        { x: endPos, y: this.top },
-        { x: endPos, y: this.bottom },
-      ]);
-    }
   }
 
   public getLaneSize(): number {
@@ -65,6 +59,13 @@ export class RoadHorizontal {
   public getLaneCenter(laneIndex: number): number {
     const laneSize = this.getLaneSize();
     return this.top + laneSize / 2 + Math.min(laneIndex, this.laneCount - 1) * laneSize;
+  }
+
+  public setFinishBorderPos(pos: number): void {
+    this.borders[2] = [
+      { x: pos, y: this.top },
+      { x: pos, y: this.bottom },
+    ];
   }
 
   public draw(ctx: CanvasRenderingContext2D): void {
@@ -90,7 +91,11 @@ export class RoadHorizontal {
     }
 
     ctx.setLineDash([]);
-    this.borders.forEach((border) => {
+    const b = [];
+    b.push(this.borders[0]);
+    b.push(this.borders[1]);
+
+    b.forEach((border) => {
       ctx.beginPath();
       ctx.moveTo(border[0].x, border[0].y);
       ctx.lineTo(border[1].x, border[1].y);

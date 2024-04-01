@@ -1,5 +1,5 @@
 import type { GarageCarResponse, GetGarageCarsResponse } from '@/api/race';
-import type { CarInput } from '@/engine';
+import type { CarInput, RoadHorizontalInput } from '@/engine';
 import { Car, RoadHorizontal } from '@/engine';
 
 import type { TrafficCar } from './TrafficCar.ts';
@@ -9,9 +9,12 @@ export type CarCreateParamsFactory = (
   car: GarageCarResponse,
 ) => Partial<Pick<CarInput, 'x' | 'y' | 'width' | 'height' | 'color' | 'skin'>>;
 
+export type RoadCreateParamsFactory = () => Partial<Pick<RoadHorizontalInput, 'skin'>>;
+
 export type CarsCreateOptions = {
   getTrafficCarParams: CarCreateParamsFactory;
   getHeroCarParams: CarCreateParamsFactory;
+  getRoadParams: RoadCreateParamsFactory;
   roadLineSize?: number;
   roadFinishPos?: number;
 };

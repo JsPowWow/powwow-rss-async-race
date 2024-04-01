@@ -1,17 +1,17 @@
 import { match } from 'ts-pattern';
 
 import type { GetGarageCarsResponse } from '@/api/race';
-import { getCarImage, getGarageCars } from '@/api/race';
+import { getCarImage, getGarageCars, getRoadImage } from '@/api/race';
 import type { EventEmitter } from '@/event-emitter';
 import type { ScopedLogger } from '@/utils';
 import { assertIsNonNullable, getLogger, isSome } from '@/utils';
 
-import type { CarCreateParamsFactory } from './models/Traffic.ts';
+import type { CarCreateParamsFactory, RoadCreateParamsFactory } from './models/Traffic.ts';
 import { Traffic } from './models/Traffic.ts';
 import { TrafficManager } from './models/trafficManager.ts';
 import type { RaceScene } from './RaceScene.ts';
 import { RaceSceneStateMachine, RaceState } from './RaceSceneState.ts';
-import type { ToolbarAction } from './toolbar/RaceSceneToolbar.ts';
+import type { SceneToolbarAction } from './toolbar/RaceSceneToolbar.ts';
 import { RaceSceneToolbarController } from './toolbar/RaceSceneToolbarController.ts';
 
 let logger: ScopedLogger;
@@ -31,11 +31,13 @@ export class RaceSceneController {
 
   private readonly raceState: RaceSceneStateMachine;
 
-  private readonly toolbarController: EventEmitter<{ onToolbarAction: ToolbarAction }>;
+  private readonly toolbarController: EventEmitter<{ onToolbarAction: SceneToolbarAction }>;
 
   private trafficCarImg?: HTMLImageElement;
 
   private heroCarImg?: HTMLImageElement;
+
+  private roadImg?: HTMLImageElement;
 
   constructor(scene: RaceScene) {
     this.scene = scene;
@@ -50,6 +52,10 @@ export class RaceSceneController {
     }
     if (!this.heroCarImg) {
       this.heroCarImg = await getCarImage('car3');
+    }
+
+    if (!this.roadImg) {
+      this.roadImg = await getRoadImage();
     }
 
     await getGarageCars()
@@ -72,7 +78,8 @@ export class RaceSceneController {
     assertIsNonNullable(this.traffic);
     this.raceState.setState(RaceState.started);
 
-    const localDistance = this.scene.getCanvasSize().width - 100;
+    const localDistance = this.scene.getCanvasSize().width - 50;
+    this.traffic.getRoad().setFinishBorderPos(this.scene.getCanvasSize().width - 100);
     const cars = this.traffic.cars();
     await Promise.allSettled(cars.map(TrafficManager.startCarEngine));
 
@@ -85,28 +92,45 @@ export class RaceSceneController {
     this.raceState.setState(RaceState.finished);
   };
 
+  private getTrafficCarDefaultParams = (): ReturnType<CarCreateParamsFactory> => {
+    return {
+      skin: {
+        img: this.trafficCarImg,
+      },
+    };
+  };
+
+  private getHeroCarDefaultParams = (): ReturnType<CarCreateParamsFactory> => {
+    return {
+      color: 'rgba(0,0,0,0)',
+      skin: {
+        img: this.heroCarImg,
+      },
+    };
+  };
+
+  private getRoadDefaultParams = (): ReturnType<RoadCreateParamsFactory> => {
+    return {
+      skin: {
+        img: this.roadImg,
+      },
+    };
+  };
+
   private buildScene = (cars: GetGarageCarsResponse): void => {
     if (isSome(this.traffic)) {
       this.traffic.destroy();
     }
     const traffic = new Traffic(cars, {
-      // roadFinishPos: this.scene.getCanvasSize().width - 3,
+      roadLineSize: 90,
       getTrafficCarParams: (car): ReturnType<CarCreateParamsFactory> => {
         return {
           color: car.color,
-          skin: {
-            img: this.trafficCarImg,
-          },
+          ...this.getTrafficCarDefaultParams(),
         };
       },
-      getHeroCarParams: (): ReturnType<CarCreateParamsFactory> => {
-        return {
-          color: 'rgba(0,0,0,0)',
-          skin: {
-            img: this.heroCarImg,
-          },
-        };
-      },
+      getHeroCarParams: this.getHeroCarDefaultParams,
+      getRoadParams: this.getRoadDefaultParams,
     });
 
     traffic.cars().forEach((car) => {
@@ -134,7 +158,7 @@ export class RaceSceneController {
     this.scene.draw(this.traffic);
   };
 
-  private onToolbarAction = (action: ToolbarAction): void => {
+  private onToolbarAction = (action: SceneToolbarAction): void => {
     logger.info('toolbarAction', `"${action}"`);
 
     match(action)

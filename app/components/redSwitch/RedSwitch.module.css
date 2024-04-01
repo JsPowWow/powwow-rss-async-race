@@ -77,7 +77,7 @@
     transform: translateY(50px) rotateX(-90deg);
     position: absolute;
     bottom: 0;
-    box-shadow: 0 50px 8px 0px black, 0 80px 20px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 50px 8px 0 black, 0 80px 20px 0 rgba(0, 0, 0, 0.5);
 }
 .switch .light {
     opacity: 0;

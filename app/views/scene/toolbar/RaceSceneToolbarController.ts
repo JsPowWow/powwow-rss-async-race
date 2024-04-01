@@ -4,33 +4,38 @@ import { EventEmitter } from '@/event-emitter';
 import { StateMachineClient } from '@/state-machine';
 import { noop } from '@/utils';
 
-import type { RaceSceneToolbar, ToolbarAction } from './RaceSceneToolbar.ts';
+import type { CarsToolbar } from './CarsToolbar.ts';
+import type { RaceSceneToolbar, SceneToolbarAction } from './RaceSceneToolbar.ts';
 import type { RaceScene } from '../RaceScene.ts';
 import type { RaceSceneStateMachine } from '../RaceSceneState.ts';
 import { RaceState } from '../RaceSceneState.ts';
 
-export class RaceSceneToolbarController extends EventEmitter<{ onToolbarAction: ToolbarAction }> {
+export class RaceSceneToolbarController extends EventEmitter<{ onSceneToolbarAction: SceneToolbarAction }> {
   private readonly toolbarStateClient: StateMachineClient<RaceState>;
 
-  private readonly toolbar: RaceSceneToolbar;
+  private readonly raceToolbar: RaceSceneToolbar;
+
+  private readonly carsToolbar: CarsToolbar;
 
   constructor(raceState: RaceSceneStateMachine, scene: RaceScene) {
     super();
-    this.toolbar = scene.toolbar;
-    this.toolbar.onAction(this.onToolbarAction);
+    this.carsToolbar = scene.carsToolbar;
+    this.raceToolbar = scene.toolbar;
+    this.raceToolbar.onAction(this.onSceneToolbarAction);
     this.toolbarStateClient = new StateMachineClient(raceState);
-    this.toolbar.setEnabled({ start: false, reset: false });
+    this.raceToolbar.setEnabled({ start: false, reset: false });
+
     this.toolbarStateClient.on('stateEnter', (event) => {
       match(event.to)
-        .with(RaceState.ready, () => this.toolbar.setEnabled({ start: true, reset: true }))
-        .with(RaceState.error, () => this.toolbar.setEnabled({ start: false, reset: false }))
-        .with(RaceState.started, () => this.toolbar.setEnabled({ start: false, reset: false }))
-        .with(RaceState.finished, () => this.toolbar.setEnabled({ start: false, reset: true }))
+        .with(RaceState.ready, () => this.raceToolbar.setEnabled({ start: true, reset: true }))
+        .with(RaceState.error, () => this.raceToolbar.setEnabled({ start: false, reset: false }))
+        .with(RaceState.started, () => this.raceToolbar.setEnabled({ start: false, reset: false }))
+        .with(RaceState.finished, () => this.raceToolbar.setEnabled({ start: false, reset: true }))
         .otherwise(noop);
     });
   }
 
-  private onToolbarAction = (action: ToolbarAction): void => {
-    this.emit('onToolbarAction', action);
+  private onSceneToolbarAction = (action: SceneToolbarAction): void => {
+    this.emit('onSceneToolbarAction', action);
   };
 }
