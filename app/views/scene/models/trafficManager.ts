@@ -1,5 +1,5 @@
-import type { CarEngineDriveFinishData, CarEngineStartedData } from '@/api/race';
-import { setCarEngineDrive, setCarEngineStarted } from '@/api/race';
+import type { CarEngineDriveStatusData, CarEngineStartStopData } from '@/api/race';
+import { setCarEngineDrive, setCarEngineStarted, setCarEngineStopped } from '@/api/race';
 import { LOCAL_SPEED } from '@/engine';
 import { State } from '@/state-machine';
 
@@ -12,13 +12,19 @@ const setCarError =
 
 const setCarReady =
   (car: TrafficCar) =>
-  (resp: CarEngineStartedData): TrafficCar => {
+  (resp: CarEngineStartStopData): TrafficCar => {
     return car.setState(new State('ready', resp));
+  };
+
+const setCarStopped =
+  (car: TrafficCar) =>
+  (resp: CarEngineStartStopData): TrafficCar => {
+    return car.setState(new State('stopped', resp));
   };
 
 const setCarFinish =
   (car: TrafficCar) =>
-  (resp: CarEngineDriveFinishData): TrafficCar => {
+  (resp: CarEngineDriveStatusData): TrafficCar => {
     return car.setState(new State('finish', resp));
   };
 
@@ -31,12 +37,18 @@ export class TrafficManager {
     return setCarEngineStarted(car).then((e) => e.fold(setCarError(car), setCarReady(car)));
   };
 
-  public static driveCar = async (car: TrafficCar): Promise<TrafficCar> => {
-    return Promise.resolve(car)
-      .then(setCarDrive)
-      .then(setCarEngineDrive)
-      .then((e) => e.fold(setCarError(car), setCarFinish(car)));
+  public static stopCarEngine = async (car: TrafficCar): Promise<TrafficCar> => {
+    return setCarEngineStopped(car).then((e) => e.fold(setCarError(car), setCarStopped(car)));
   };
+
+  public static driveCar =
+    (abortController?: (s: AbortController) => void) =>
+    async (car: TrafficCar): Promise<TrafficCar> => {
+      return Promise.resolve(car)
+        .then(setCarDrive)
+        .then(setCarEngineDrive(abortController))
+        .then((e) => e.fold(setCarError(car), setCarFinish(car)));
+    };
 
   public static getLocalSpeed = (localDistance: number, car: TrafficCar): number => {
     return localDistance / (car.getDriveStartData().time * LOCAL_SPEED);
@@ -44,7 +56,7 @@ export class TrafficManager {
 
   public static getDriveData =
     (trafficDistance: number) =>
-    (car: TrafficCar): CarEngineStartedData & { time: number } => {
+    (car: TrafficCar): CarEngineStartStopData & { time: number } => {
       const { distance, time, velocity, ...rest } = car.getDriveStartData();
       const localVelocity = (trafficDistance * velocity) / distance;
       return { ...rest, distance: trafficDistance, time, velocity: localVelocity };

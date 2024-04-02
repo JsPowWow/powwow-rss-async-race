@@ -1,4 +1,4 @@
-import type { CarEngineDriveFinishData, CarEngineStartedData } from '@/api/race';
+import type { CarEngineDriveStatusData, CarEngineStartStopData } from '@/api/race';
 import type { Car } from '@/engine';
 import type { IState, IStateMachineDefinition } from '@/state-machine';
 import { State, StateMachine, StateMachineClient } from '@/state-machine';
@@ -6,18 +6,20 @@ import type { WithDebugOptions } from '@/utils';
 
 export type CarState =
   | IState<undefined, 'init'>
-  | IState<CarEngineStartedData, 'ready'>
+  | IState<CarEngineStartStopData, 'ready'>
   | IState<undefined, 'drive'>
-  | IState<CarEngineDriveFinishData, 'finish'>
+  | IState<CarEngineStartStopData, 'stopped'>
+  | IState<CarEngineDriveStatusData, 'finish'>
   | IState<Error, 'error'>;
 
 const transitions: Record<CarState['state'], Array<CarState['state']>> = {
   // from | next state(s)
   init: ['ready'],
   ready: ['drive', 'error'],
-  drive: ['init', 'finish', 'error'],
+  drive: ['init', 'stopped', 'finish', 'error'],
+  stopped: ['error', 'ready'],
   finish: ['ready'],
-  error: ['init', 'ready'],
+  error: ['init', 'ready', 'stopped'],
 };
 
 const carStateDefinition: IStateMachineDefinition<CarState> = {
@@ -48,7 +50,7 @@ export class TrafficCar extends StateMachine<CarState> {
 
   public static toPaintCar = (c: TrafficCar): Car => c.car;
 
-  public getDriveStartData = (): CarEngineStartedData & { time: number } => {
+  public getDriveStartData = (): CarEngineStartStopData & { time: number } => {
     if (this.state.state === 'ready') {
       const { velocity, distance } = this.state.data;
       return { carId: this.id, velocity, distance, time: distance / velocity };

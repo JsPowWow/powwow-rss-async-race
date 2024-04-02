@@ -2,15 +2,16 @@ import { match } from 'ts-pattern';
 
 import type { GetGarageCarsResponse } from '@/api/race';
 import { getCarImage, getGarageCars, getRoadImage } from '@/api/race';
-import type { EventEmitter } from '@/event-emitter';
 import type { ScopedLogger } from '@/utils';
 import { assertIsNonNullable, getLogger, isSome } from '@/utils';
 
 import type { CarCreateParamsFactory, RoadCreateParamsFactory } from './models/Traffic.ts';
 import { Traffic } from './models/Traffic.ts';
+import type { TrafficCar } from './models/TrafficCar.ts';
 import { TrafficManager } from './models/trafficManager.ts';
 import type { RaceScene } from './RaceScene.ts';
 import { RaceSceneStateMachine, RaceState } from './RaceSceneState.ts';
+import type { CarToolbarAction } from './toolbar/CarsToolbar.ts';
 import type { SceneToolbarAction } from './toolbar/RaceSceneToolbar.ts';
 import { RaceSceneToolbarController } from './toolbar/RaceSceneToolbarController.ts';
 
@@ -31,7 +32,7 @@ export class RaceSceneController {
 
   private readonly raceState: RaceSceneStateMachine;
 
-  private readonly toolbarController: EventEmitter<{ onToolbarAction: SceneToolbarAction }>;
+  private readonly toolbarController: RaceSceneToolbarController;
 
   private trafficCarImg?: HTMLImageElement;
 
@@ -39,11 +40,14 @@ export class RaceSceneController {
 
   private roadImg?: HTMLImageElement;
 
+  private abortCarSignalsMap: WeakMap<TrafficCar, AbortController> = new WeakMap<TrafficCar, AbortController>();
+
   constructor(scene: RaceScene) {
     this.scene = scene;
     this.raceState = new RaceSceneStateMachine();
     this.toolbarController = new RaceSceneToolbarController(this.raceState, this.scene);
-    this.toolbarController.on('onToolbarAction', this.onToolbarAction);
+    this.toolbarController.on('onSceneToolbarAction', this.onSceneToolbarAction);
+    this.toolbarController.on('onCarToolbarAction', this.onCarToolbarAction);
   }
 
   public initialize = async (): Promise<void> => {
@@ -74,7 +78,7 @@ export class RaceSceneController {
       .catch(logger.error);
   };
 
-  public startRace = async (): Promise<void> => {
+  private startAll = async (): Promise<void> => {
     assertIsNonNullable(this.traffic);
     this.raceState.setState(RaceState.started);
 
@@ -87,9 +91,31 @@ export class RaceSceneController {
       c.car.setSpeed(TrafficManager.getLocalSpeed(localDistance, c));
     });
 
-    await Promise.allSettled(cars.map(TrafficManager.driveCar));
+    await Promise.allSettled(cars.map(TrafficManager.driveCar()));
 
     this.raceState.setState(RaceState.finished);
+  };
+
+  private setAbortSignal =
+    (car: TrafficCar) =>
+    (s: AbortController): void => {
+      this.abortCarSignalsMap.set(car, s);
+    };
+
+  private startCar = async (car: TrafficCar): Promise<void> => {
+    assertIsNonNullable(this.traffic);
+    const localDistance = this.scene.getCanvasSize().width - 50 - car.car.x;
+    this.traffic.getRoad().setFinishBorderPos(this.scene.getCanvasSize().width - 100);
+    await TrafficManager.startCarEngine(car);
+    car.car.setSpeed(TrafficManager.getLocalSpeed(localDistance, car));
+    await TrafficManager.driveCar(this.setAbortSignal(car))(car);
+  };
+
+  private stopCar = async (car: TrafficCar): Promise<void> => {
+    assertIsNonNullable(this.traffic);
+    this.abortCarSignalsMap.get(car)?.abort();
+    await TrafficManager.stopCarEngine(car);
+    car.car.setSpeed(0);
   };
 
   private getTrafficCarDefaultParams = (): ReturnType<CarCreateParamsFactory> => {
@@ -158,7 +184,7 @@ export class RaceSceneController {
     this.scene.draw(this.traffic);
   };
 
-  private onToolbarAction = (action: SceneToolbarAction): void => {
+  private onSceneToolbarAction = (action: SceneToolbarAction): void => {
     logger.info('toolbarAction', `"${action}"`);
 
     match(action)
@@ -166,7 +192,19 @@ export class RaceSceneController {
         this.initialize().catch(logger.error);
       })
       .with('start', (_a) => {
-        this.startRace().catch(logger.error);
+        this.startAll().catch(logger.error);
+      })
+      .exhaustive();
+  };
+
+  private onCarToolbarAction = (action: CarToolbarAction): void => {
+    logger.info('carToolbarAction', `"${action.action}"`);
+    match(action)
+      .with({ action: 'start' }, (a) => {
+        this.startCar(a.car).catch(logger.error);
+      })
+      .with({ action: 'stop' }, (a) => {
+        this.stopCar(a.car).catch(logger.error);
       })
       .exhaustive();
   };

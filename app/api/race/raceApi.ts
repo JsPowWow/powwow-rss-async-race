@@ -36,11 +36,11 @@ export const getGarageCars = async (): Promise<Either<Error, GetGarageCarsRespon
   );
 };
 
-export type CarEngineStartedData = WithCarId<CarStartEngineResponse>;
+export type CarEngineStartStopData = WithCarId<CarStartEngineResponse>;
 export const setCarEngineStarted = async (payload: {
   id: number;
-}): Promise<Either<CarResponseError, CarEngineStartedData>> => {
-  return fromPromise<CarResponseError, CarEngineStartedData>(
+}): Promise<Either<CarResponseError, CarEngineStartStopData>> => {
+  return fromPromise<CarResponseError, CarEngineStartStopData>(
     fetch(`${API_URL}/engine?id=${payload.id}&status=started`, { method: 'PATCH' })
       .then(validateResponseStatus(payload.id))
       .then((data) => parse(CarStartEngineSchema, data))
@@ -48,16 +48,31 @@ export const setCarEngineStarted = async (payload: {
   );
 };
 
-export type CarEngineDriveFinishData = WithCarId<SuccessResponse>;
-export const setCarEngineDrive = async (payload: {
+export const setCarEngineStopped = async (payload: {
   id: number;
-}): Promise<Either<CarResponseError, CarEngineDriveFinishData>> => {
-  return fromPromise<CarResponseError, CarEngineDriveFinishData>(
-    fetch(`${API_URL}/engine?id=${payload.id}&status=drive`, { method: 'PATCH' })
+}): Promise<Either<CarResponseError, CarEngineStartStopData>> => {
+  return fromPromise<CarResponseError, CarEngineStartStopData>(
+    fetch(`${API_URL}/engine?id=${payload.id}&status=stopped`, { method: 'PATCH' })
       .then(validateResponseStatus(payload.id))
-      .then((data) => parse(SuccessResponseSchema, data))
+      .then((data) => parse(CarStartEngineSchema, data))
       .then(withCarId(payload.id)),
   );
+};
+
+export type CarEngineDriveStatusData = WithCarId<SuccessResponse>;
+export const setCarEngineDrive = (abortController?: (s: AbortController) => void) => {
+  return async (payload: { id: number }): Promise<Either<CarResponseError, CarEngineDriveStatusData>> => {
+    const controller = new AbortController();
+    if (abortController) {
+      abortController(controller);
+    }
+    return fromPromise<CarResponseError, CarEngineDriveStatusData>(
+      fetch(`${API_URL}/engine?id=${payload.id}&status=drive`, { method: 'PATCH', signal: controller.signal })
+        .then(validateResponseStatus(payload.id))
+        .then((data) => parse(SuccessResponseSchema, data))
+        .then(withCarId(payload.id)),
+    );
+  };
 };
 
 export const getCarImage = async (car: 'car1' | 'car2' | 'car3'): Promise<HTMLImageElement> =>
