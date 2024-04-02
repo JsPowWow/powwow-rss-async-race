@@ -42,6 +42,9 @@ export class RaceSceneCanvas extends CanvasComponent {
     // ctx.translate(-hero.x + this.width * 0.7, 0);
     // ctx.translate(-hero.x + hero.width * 1.5, 0);
 
+    ctx.translate(0, -hero.y + trafficRoad.height - 15);
+    ctx.translate(-hero.x + hero.width * 2.5, 0);
+
     trafficRoad.draw(ctx);
 
     for (let i = 0; i < trafficCars.length; i++) {

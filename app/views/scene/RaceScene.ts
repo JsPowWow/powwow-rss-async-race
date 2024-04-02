@@ -25,6 +25,16 @@ export class RaceScene extends Component<'div'> {
     this.appendChild(
       new Component('div').toggleClass(classes.sceneCanvasContainer).appendChildren([this.carsToolbar, this.canvas]),
     );
+    this.appendChild(
+      new Component('div').toggleClass(classes.sceneTip).setTextContent(
+        `Use the "${String.fromCodePoint(0x2190)}"  
+          "${String.fromCodePoint(0x2192)}"  
+          "${String.fromCodePoint(0x2191)}" 
+          "${String.fromCodePoint(0x2193)}"
+          arrow keys to manage red 🔥 hero car          
+          `,
+      ),
+    );
   }
 
   public draw(traffic: Traffic): typeof this {

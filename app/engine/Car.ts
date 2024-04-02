@@ -101,6 +101,11 @@ export class Car implements PolyShape {
     return this;
   }
 
+  public setDamaged(isDamaged: boolean): typeof this {
+    this.damaged = isDamaged;
+    return this;
+  }
+
   public getPolygon(): Polygon {
     return this.polygon.concat();
   }

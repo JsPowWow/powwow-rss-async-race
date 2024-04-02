@@ -82,8 +82,8 @@ export class RaceSceneController {
     assertIsNonNullable(this.traffic);
     this.raceState.setState(RaceState.started);
 
-    const localDistance = this.scene.getCanvasSize().width - 50;
-    this.traffic.getRoad().setFinishBorderPos(this.scene.getCanvasSize().width - 100);
+    const localDistance = this.scene.getCanvasSize().width;
+    this.traffic.getRoad().setFinishBorderPos(localDistance - 100);
     const cars = this.traffic.cars();
     await Promise.allSettled(cars.map(TrafficManager.startCarEngine));
 
@@ -104,8 +104,9 @@ export class RaceSceneController {
 
   private startCar = async (car: TrafficCar): Promise<void> => {
     assertIsNonNullable(this.traffic);
-    const localDistance = this.scene.getCanvasSize().width - 50 - car.car.x;
-    this.traffic.getRoad().setFinishBorderPos(this.scene.getCanvasSize().width - 100);
+    const localDistance = this.scene.getCanvasSize().width;
+    this.traffic.getRoad().setFinishBorderPos(localDistance - 100);
+
     await TrafficManager.startCarEngine(car);
     car.car.setSpeed(TrafficManager.getLocalSpeed(localDistance, car));
     await TrafficManager.driveCar(this.setAbortSignal(car))(car);
@@ -174,6 +175,7 @@ export class RaceSceneController {
       car.stateClient.onStateEnter('error', (e) => {
         if (e.to.state === 'error') {
           car.car.setSpeed(0);
+          car.car.setDamaged(true);
           logger.warn(car, 'is in error state', { err: e.to.data });
         }
       });

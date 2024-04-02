@@ -73,7 +73,7 @@ export class RoadHorizontal {
       const pattern = ctx.createPattern(this.skin, 'repeat');
       if (pattern) {
         ctx.fillStyle = pattern;
-        ctx.fillRect(0, this.top - 10, this.right, this.bottom); // context.fillRect(x, y, width, height);
+        ctx.fillRect(-2000, this.top - 10, this.right, this.bottom); // context.fillRect(x, y, width, height);
       }
     }
 
@@ -101,5 +101,12 @@ export class RoadHorizontal {
       ctx.lineTo(border[1].x, border[1].y);
       ctx.stroke();
     });
+
+    if (this.borders[2]) {
+      ctx.beginPath();
+      ctx.moveTo(this.borders[2][0].x, this.borders[2][0].y);
+      ctx.lineTo(this.borders[2][1].x, this.borders[2][1].y);
+      ctx.stroke();
+    }
   }
 }
