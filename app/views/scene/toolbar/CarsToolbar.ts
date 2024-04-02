@@ -23,6 +23,9 @@ export class CarsToolbar extends Component<'div'> {
           this.onCarActionCallback({ car, action: isToggle ? 'start' : 'stop' });
         }
       });
+      car.stateClient.onStateLeave('drive', (_e) => {
+        toggler.setChecked(false);
+      });
     });
     return this;
   }
