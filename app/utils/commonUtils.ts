@@ -83,3 +83,12 @@ export function debounce<T extends AnyVoidFunction>(func: T, wait: number, immed
     }, wait);
   };
 }
+
+export const randomInt = (min: number, max: number): number => {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
+};
+
+export function clamp01(input: number): number {
+  return Math.min(Math.max(input, 0), 1);
+}
