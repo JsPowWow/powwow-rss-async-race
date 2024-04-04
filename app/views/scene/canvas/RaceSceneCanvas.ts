@@ -50,7 +50,7 @@ export class RaceSceneCanvas extends CanvasComponent {
     });
 
     loopAnimation(() => {
-      const spread = 2;
+      const spread = 0.3;
       const hero = traffic.getHeroCar();
 
       if (hero.isDamaged) {
@@ -82,7 +82,7 @@ export class RaceSceneCanvas extends CanvasComponent {
               },
             );
         });
-    }, 130);
+    }, 40);
 
     return this;
   }
