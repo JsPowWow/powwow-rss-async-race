@@ -37,6 +37,7 @@
         align-items: start;
         position: relative;
         width: 100%;
+        min-height: 355px;
 
         & .scene-cars-toolbar {
             display: flex;
@@ -55,6 +56,16 @@
            /*left: 0;*/
            /*right: 0;*/
        }
+
+        & .smoke-canvas {
+            position: absolute;
+            /*opacity: 0.5;*/
+            visibility: hidden;
+            left: 155px;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
     }
 
     & .scene-tip {
@@ -62,6 +73,7 @@
         width: 100%;
         padding: 5px;
         justify-content: center;
+        user-select: none;
     }
 }
 

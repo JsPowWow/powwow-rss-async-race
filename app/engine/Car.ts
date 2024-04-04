@@ -1,5 +1,5 @@
 import type { Point, Polygon, Rect } from '@/geometry';
-import { Rectangle, polysIntersect } from '@/geometry';
+import { Rectangle, getMidPoint, polysIntersect } from '@/geometry';
 import { assertIsNonNullable } from '@/utils';
 
 import type { ControlType } from './Controls.js';
@@ -53,6 +53,8 @@ export class Car implements PolyShape {
 
   private readonly img?: HTMLImageElement;
 
+  private passPath: Array<{ x: number; y: number }> = [];
+
   constructor(args: CarInput) {
     const { x, y, width, height, controlType, speed = 0, color = 'yellow', name = '', startAngle = 0 } = args;
     this.name = name;
@@ -101,9 +103,21 @@ export class Car implements PolyShape {
     return this;
   }
 
+  public get currentSpeed(): number {
+    return Math.min(Math.abs(this._speed), this.maxSpeed);
+  }
+
+  public getPassPath = (): Array<{ x: number; y: number }> => {
+    return this.passPath;
+  };
+
   public setDamaged(isDamaged: boolean): typeof this {
     this.damaged = isDamaged;
     return this;
+  }
+
+  public get isDamaged(): boolean {
+    return this.damaged;
   }
 
   public getPolygon(): Polygon {
@@ -130,6 +144,10 @@ export class Car implements PolyShape {
     return this.carAngle;
   }
 
+  public getBack(): Point {
+    return getMidPoint(this.polygon[2], this.polygon[3]);
+  }
+
   public update(roadBorders: Point[][], traffic: PolyShape[]): void {
     if (!this.damaged) {
       this.move();
@@ -147,6 +165,12 @@ export class Car implements PolyShape {
     }
     if (this.sensor) {
       this.sensor.update(roadBorders, traffic);
+    }
+    if (this.currentSpeed > 0) {
+      this.passPath.unshift(this.getBack());
+      if (this.passPath.length > 5) {
+        this.passPath.length = 5;
+      }
     }
   }
 
