@@ -8,6 +8,10 @@ export function isSome<T>(value: unknown): value is NonNullable<T> {
   return value !== null && value !== undefined;
 }
 
+export function isSomeFunction<Fn extends (...args: unknown[]) => unknown>(value: unknown): value is NonNullable<Fn> {
+  return isSome<Fn>(value) && typeof value === 'function';
+}
+
 export function assertIsNonNullable<T>(value: unknown, ...infos: Array<unknown>): asserts value is NonNullable<T> {
   if (value === undefined || value === null) {
     throw new Error(`Nullish assertion Error: "${String(value)}"; ${infos?.join(' ')}`);

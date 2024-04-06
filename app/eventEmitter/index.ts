@@ -1,6 +1,6 @@
-import type { AnyValue } from '@/utils';
+import { isSomeFunction } from '@/utils';
 
-export type EventMap = Record<string, AnyValue>;
+export type EventMap = Record<string, unknown>;
 export type EventKey<Events extends EventMap> = string & keyof Events;
 export type EventListener<Event> = (event: Event) => void;
 
@@ -16,13 +16,17 @@ export class EventEmitter<T extends EventMap> implements Emitter<T> {
   } = {};
 
   public on = <K extends EventKey<T>>(eventName: K, callback: EventListener<T[K]>): void => {
-    if (typeof eventName === 'string' && typeof callback === 'function') {
-      this.listeners[eventName] = (this.listeners[eventName] ?? []).concat(callback);
+    if (typeof eventName === 'string' && isSomeFunction<(p: EventMap[K]) => void>(callback)) {
+      this.subscribe<K, (p: EventMap[K]) => void>(eventName, callback);
     }
   };
 
+  private subscribe = <K extends EventKey<T>, C extends (p: EventMap[K]) => void>(eventName: K, callback: C): void => {
+    this.listeners[eventName] = (this.listeners[eventName] ?? []).concat(callback);
+  };
+
   public off = <K extends EventKey<T>>(eventName: K, callback: EventListener<T[K]>): void => {
-    if (typeof eventName === 'string' && typeof callback === 'function') {
+    if (typeof eventName === 'string' && isSomeFunction(callback)) {
       this.listeners[eventName] = (this.listeners[eventName] ?? []).filter((f) => f !== callback);
     }
   };
