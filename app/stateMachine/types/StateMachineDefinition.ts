@@ -1,4 +1,4 @@
-export interface IStateMachineDefinition<State> {
+export type IStateMachineDefinition<State, Action = State> = {
   initialState: State;
-  getNextState: (currentState: State, newState: State) => State;
-}
+  getNextState: (currentState: State, next: Action | State) => State;
+};

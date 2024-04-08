@@ -5,21 +5,24 @@ import type { IStateMachine, StateMachineEventsMap } from './types/StateMachine.
 import { StateMachineEvents } from './types/StateMachine.ts';
 import type { IStateMachineDefinition } from './types/StateMachineDefinition.ts';
 
-export type BaseStateMachineInput<State> = WithDebugOptions<{
+export type BaseStateMachineInput<State, Action> = WithDebugOptions<{
   name?: string;
-  definition: IStateMachineDefinition<State>;
+  definition: IStateMachineDefinition<State, Action>;
 }>;
 
-export class StateMachine<S> extends EventEmitter<StateMachineEventsMap<S>> implements IStateMachine<S> {
+export class StateMachine<State, Action = State>
+  extends EventEmitter<StateMachineEventsMap<State, Action>>
+  implements IStateMachine<State, Action>
+{
   protected logger?: ILogger;
 
   protected readonly name: string;
 
-  protected readonly definition: IStateMachineDefinition<S>;
+  protected readonly definition: IStateMachineDefinition<State, Action>;
 
-  protected currentState: S;
+  protected currentState: State;
 
-  constructor(input: BaseStateMachineInput<S>) {
+  constructor(input: BaseStateMachineInput<State, Action>) {
     super();
 
     const { name = '', definition } = input;
@@ -32,29 +35,34 @@ export class StateMachine<S> extends EventEmitter<StateMachineEventsMap<S>> impl
     this.currentState = definition.initialState;
   }
 
-  public get state(): S {
+  public get state(): State {
     return this.currentState;
   }
 
-  public isInState(state: S): state is S {
+  public isInState(state: State): state is State {
     return this.currentState === state;
   }
 
-  public setState(newState: S): typeof this {
+  public setState(next: State | Action): typeof this {
     const prevState = this.currentState;
     try {
-      this.currentState = this.definition.getNextState(this.currentState, newState);
+      this.currentState = this.definition.getNextState(this.currentState, next);
       this.logger?.info(`${this.name} state changed ${String(prevState)} -> ${String(this.currentState)}`);
     } catch (setStateError) {
       this.logger?.error(
-        `${this.name}:setState(.. Error occurred on (${String(prevState)} -> ${String(newState)})`,
+        `${this.name}:setState(.. Error occurred on (${String(prevState)} -> ${String(next)})`,
         setStateError,
       );
       return this;
     }
 
     try {
-      this.emit(StateMachineEvents.stateChange, { type: 'stateChange', from: prevState, to: this.currentState });
+      this.emit(StateMachineEvents.stateChange, {
+        type: 'stateChange',
+        from: prevState,
+        to: this.currentState,
+        by: next,
+      });
     } catch (error) {
       this.logger?.error(
         `${this.name}: Error occurred on (${String(prevState)} -> ${String(this.currentState)}) event emit`,
